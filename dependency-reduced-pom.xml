@@ -161,7 +161,7 @@
                 <exclude>.github/**</exclude>
               </excludes>
               <properties>
-                <project.inceptionYear>2020-2021</project.inceptionYear>
+                <year>2020-2021</year>
                 <owner>PVPINStudio</owner>
               </properties>
             </licenseSet>
