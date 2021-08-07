@@ -25,7 +25,9 @@ package com.pvpin.pvpincore.api;
 import com.pvpin.pvpincore.impl.translation.TranslationEntityType;
 import com.pvpin.pvpincore.impl.translation.TranslationMaterial;
 import com.pvpin.pvpincore.impl.translation.TranslationPotionEffectType;
+import com.pvpin.pvpincore.impl.translation.TranslationSound;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -105,6 +107,28 @@ public class PVPINTranslation {
      */
     public static String getLocalizedName(Player player, PotionEffectType type) {
         return getLocalizedName(player.getLocale(), type);
+    }
+
+    /**
+     * This method is used to get potion effect type translations.
+     *
+     * @param locale target locale
+     * @param sound  sound type to be translated
+     * @return the official translation of the  potion effect type
+     */
+    public static String getLocalizedName(String locale, Sound sound) {
+        return TranslationSound.getLocalizedName(locale, sound);
+    }
+
+    /**
+     * This method is used to get potion effect type translations.
+     *
+     * @param player target locale (of the player)
+     * @param sound  sound type to be translated
+     * @return the official translation of the  potion effect type
+     */
+    public static String getLocalizedName(Player player, Sound sound) {
+        return getLocalizedName(player.getLocale(), sound);
     }
 
 }

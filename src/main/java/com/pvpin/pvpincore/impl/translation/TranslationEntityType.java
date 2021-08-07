@@ -47,7 +47,13 @@ public class TranslationEntityType {
 
     protected static String getMojangKey(EntityType type) {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            return EntityTypeTranslationNMSUtils.getEntityNameOrKey(type);
+            try {
+                return EntityTypeTranslationNMSUtils.getEntityNameOrKey(type);
+            } catch (IllegalArgumentException expected) {
+                // When trying to spawn hanging entities.
+                // When trying to spawn players or fishing hooks.
+            }
+            return "null";
         } else {
             return "entity." + EntityTypeTranslationNMSUtils.getEntityNameOrKey(type) + ".name";
         }
