@@ -93,6 +93,10 @@
               <shadedPattern>shaded.logging.ch.qos.logback</shadedPattern>
             </relocation>
             <relocation>
+              <pattern>com.github.cryptomorin</pattern>
+              <shadedPattern>shaded.xseries.com.github.cryptomorin</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>io.github.classgraph</pattern>
               <shadedPattern>shaded.asm.io.github.classgraph</shadedPattern>
             </relocation>

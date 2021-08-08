@@ -137,6 +137,11 @@
             <version>4.5.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>8.3.0</version>
+        </dependency>
 
     </dependencies>
 
@@ -200,6 +205,10 @@
                         <relocation>
                             <pattern>ch.qos.logback</pattern>
                             <shadedPattern>shaded.logging.ch.qos.logback</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.github.cryptomorin</pattern>
+                            <shadedPattern>shaded.xseries.com.github.cryptomorin</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>io.github.classgraph</pattern>
