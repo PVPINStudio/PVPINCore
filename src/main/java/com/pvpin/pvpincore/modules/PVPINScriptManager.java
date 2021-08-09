@@ -32,7 +32,7 @@ import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.impl.scheduler.TaskBuilder;
 import com.pvpin.pvpincore.modules.js.ClassChecker;
 import com.pvpin.pvpincore.modules.js.JSPlugin;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
 import org.bukkit.event.EventPriority;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;

@@ -22,6 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.translation;
 
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.block.BlockNMSUtils;
 import com.pvpin.pvpincore.impl.nms.itemstack.ItemStackNMSUtils;
 
@@ -98,6 +99,7 @@ public class TranslationMaterial {
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 class ItemStackTranslationNBTUtils extends ItemStackNMSUtils {
 
     protected static Method nmsItem_getName;
@@ -133,6 +135,7 @@ class ItemStackTranslationNBTUtils extends ItemStackNMSUtils {
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 class BlockTranslationNMSUtils extends BlockNMSUtils {
     protected static Method nmsBlock_getName;
     protected static final Random ran;

@@ -22,10 +22,13 @@
  */
 package com.pvpin.pvpincore.modules.utils;
 
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+
 /**
  *
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 public class VersionChecker {
 
     public static final String version = org.bukkit.Bukkit.getServer().getClass().getPackage().getName()

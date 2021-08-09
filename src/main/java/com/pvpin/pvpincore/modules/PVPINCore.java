@@ -26,20 +26,19 @@ import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.modules.command.MainCommand;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
-import com.pvpin.pvpincore.modules.swing.JFrameManager;
+import com.pvpin.pvpincore.modules.utils.LibraryLoader;
+import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.utils.VersionChecker;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.bukkit.Bukkit;
-import org.bukkit.command.TabExecutor;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import sun.misc.Unsafe;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author William_Shi
@@ -52,16 +51,19 @@ public class PVPINCore extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
         coreInstance = this;
         pluginManagerInstance = new PVPINPluginManager();
         scriptManagerInstance = new PVPINScriptManager();
 
         try {
-            Class.forName("com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory");
+            Class.forName(PVPINLoggerFactory.class.getName());
             // Logging is initialized first.
-            Class.forName("com.pvpin.pvpincore.modules.utils.VersionChecker");
+            Class.forName(VersionChecker.class.getName());
             // VersionChecker is used in many NMS related classes.
             // So load it before any NMSUtils subclass is loaded.
+            LibraryLoader.loadLibraries();
+            // Download libraries.
 
             try (ScanResult scanResult = new ClassGraph()
                     .enableAllInfo()
@@ -70,7 +72,7 @@ public class PVPINCore extends JavaPlugin {
                 scanResult.getClassesWithAnnotation(PVPINLoadOnEnable.class.getName())
                         .forEach(action -> {
                             try {
-                                Class.forName(action.getName());
+                                action.loadClass();
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }

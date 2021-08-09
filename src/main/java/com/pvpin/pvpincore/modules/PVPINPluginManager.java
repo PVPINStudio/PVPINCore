@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.api.PVPINListener;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
 import com.pvpin.pvpincore.modules.js.ClassChecker;
 import com.pvpin.pvpincore.modules.utils.ClassScanner;
 import io.github.classgraph.ScanResult;

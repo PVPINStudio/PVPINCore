@@ -1,8 +1,6 @@
 package com.pvpin.pvpincore.demo;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.api.PVPINTranslation;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;

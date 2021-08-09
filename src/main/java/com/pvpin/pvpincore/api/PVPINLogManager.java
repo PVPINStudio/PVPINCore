@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.api;
 
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
 import org.slf4j.Logger;
 
 

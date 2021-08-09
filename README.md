@@ -10,7 +10,7 @@ PVPINCore 是由 PVPINStudio 团队成员 `William_Shi`、 `Rain_Effect`、`Miao
 
 本插件主要使用 Java 编写而成，但同时提供了一系列供 JavaScript 调用的方法。
 
-本插件完整附带了 GraalJS v21.2.0 并以此加载 JavaScript 代码，因此文件较大。正在考虑加入运行时下载依赖功能以减小体积。
+本插件使用 GraalJS v21.2.0 并以此加载 JavaScript 代码。
 
 PVPINCore is a Bukkit Plugin developed by `William_Shi`, `Rain_Effect`, `MiaoWoo` and `Eustia_Saint` from PVPINStudio.
 
@@ -18,7 +18,7 @@ This plugin can be used to load custom JavaScript plugins written by users.
 
 Though written in Java, this plugin provides a series of APIs easy for JavaScript to use.
 
-This plugin uses GraalJS 21.2.0 to load JavaScript code, thus making the Jar's size big.
+This plugin uses GraalJS 21.2.0 to load JavaScript code.
 
 ## Usage
 

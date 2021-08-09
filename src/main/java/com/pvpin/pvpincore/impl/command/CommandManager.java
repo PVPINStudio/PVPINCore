@@ -22,6 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.command;
 
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
@@ -48,6 +49,7 @@ import org.graalvm.polyglot.Value;
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 public class CommandManager {
 
     protected static final List<JSCommand> JAVASCRIPT_CMDS = new ArrayList(32);

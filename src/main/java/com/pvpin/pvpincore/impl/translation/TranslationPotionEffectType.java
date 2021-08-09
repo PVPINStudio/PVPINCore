@@ -34,6 +34,7 @@ import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.potion.PotionEffectType;
 
@@ -80,6 +81,7 @@ public class TranslationPotionEffectType {
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 class PotionTypeTranslationNBTUtils extends NMSUtils {
 
     protected static Class<?> nmsRegistryMaterials;

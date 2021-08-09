@@ -76,13 +76,29 @@
               <excludes>
                 <exclude>**LICENSE**</exclude>
                 <exclude>**NOTICE**</exclude>
+                <exclude>licenses/**</exclude>
+                <exclude>about.html</exclude>
+                <exclude>*.xml</exclude>
+                <exclude>*.xsd</exclude>
               </excludes>
             </filter>
           </filters>
           <relocations>
             <relocation>
-              <pattern>org.apache.logging</pattern>
-              <shadedPattern>shaded.logging.org.apache.logging</shadedPattern>
+              <pattern>org.apache</pattern>
+              <shadedPattern>shaded.apache.org.apache</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.aopalliance</pattern>
+              <shadedPattern>shaded.aether.org.aopalliance</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.codehaus</pattern>
+              <shadedPattern>shaded.aether.org.codehaus</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.eclipse</pattern>
+              <shadedPattern>shaded.aether.org.eclipse</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.slf4j</pattern>
@@ -93,8 +109,16 @@
               <shadedPattern>shaded.logging.ch.qos.logback</shadedPattern>
             </relocation>
             <relocation>
-              <pattern>com.github.cryptomorin</pattern>
+              <pattern>com.google.inject</pattern>
+              <shadedPattern>shaded.aether.com.google.inject</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.cryptomorin</pattern>
               <shadedPattern>shaded.xseries.com.github.cryptomorin</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.jcraft</pattern>
+              <shadedPattern>shaded.aether.com.jcraft</shadedPattern>
             </relocation>
             <relocation>
               <pattern>io.github.classgraph</pattern>
@@ -119,6 +143,22 @@
             <relocation>
               <pattern>com.ibm.icu</pattern>
               <shadedPattern>shaded.icu.com.ibm.icu</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>javax.inject</pattern>
+              <shadedPattern>shaded.javax.inject</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>javax.decorator</pattern>
+              <shadedPattern>shaded.javax.decorator</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>javax.enterprise</pattern>
+              <shadedPattern>shaded.javax.enterprise</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>javax.annotation</pattern>
+              <shadedPattern>shaded.javax.annotation</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
@@ -199,10 +239,6 @@
       <url>https://repo.codemc.io/repository/nms/</url>
     </repository>
     <repository>
-      <id>mojang</id>
-      <url>https://libraries.minecraft.net</url>
-    </repository>
-    <repository>
       <id>spigotmc-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
@@ -232,6 +268,24 @@
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
       <version>1.16.5-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.sdk</groupId>
+      <artifactId>graal-sdk</artifactId>
+      <version>21.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+      <version>21.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
+      <version>21.2.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

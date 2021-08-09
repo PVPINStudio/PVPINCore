@@ -20,8 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.logging;
+package com.pvpin.pvpincore.modules.utils;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -50,6 +51,11 @@ public class PVPINLoggerFactory {
 
     static {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ((Logger)LoggerFactory.getLogger("org.apache")).setLevel(Level.OFF);
+        ((Logger)LoggerFactory.getLogger("org.apache.http.headers")).setLevel(Level.OFF);
+        ((Logger)LoggerFactory.getLogger("org.apache.http.wire")).setLevel(Level.OFF);
+        ((Logger)LoggerFactory.getLogger("org.eclipse.aether")).setLevel(Level.OFF);
+
         CORE_LOGGER = (Logger) LoggerFactory.getLogger("CORE_LOGGER");
         MAP.put("CORE_LOGGER", CORE_LOGGER);
         CORE_LOGGER.setAdditive(false);

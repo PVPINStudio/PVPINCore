@@ -1,8 +1,6 @@
 package com.pvpin.pvpincore.demo;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.api.PVPINPersistence;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 
 import java.util.List;
 import java.util.Map;

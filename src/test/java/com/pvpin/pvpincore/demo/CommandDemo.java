@@ -1,8 +1,6 @@
 package com.pvpin.pvpincore.demo;
 
 import com.pvpin.pvpincore.api.PVPINCommand;
-import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

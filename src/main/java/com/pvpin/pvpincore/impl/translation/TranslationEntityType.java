@@ -22,6 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.translation;
 
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.entity.EntityNMSUtils;
 
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getEN_USName;
@@ -93,6 +94,7 @@ public class TranslationEntityType {
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 class EntityTypeTranslationNMSUtils extends EntityNMSUtils {
 
     protected static final Random ran;

@@ -7,9 +7,6 @@
 package com.pvpin.pvpincore.demo;
 
 import com.pvpin.pvpincore.api.PVPINListener;
-import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.api.PVPINPersistence;
-import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerCommandEvent;

@@ -23,6 +23,7 @@
 package com.pvpin.pvpincore.impl.nms.entity;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.utils.VersionChecker;
 import org.bukkit.entity.Player;
 
@@ -38,6 +39,7 @@ import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 /**
  * @author William_Shi
  */
+@PVPINLoadOnEnable
 public class PlayerNMSUtils extends EntityNMSUtils {
 
     protected static Class<?> nmsPlayer;
