@@ -132,4 +132,17 @@ public class ItemStackNMSUtils extends NMSUtils {
         return null;
     }
 
+    /**
+     * @param nmsItem     ItemStack in NMS.
+     * @param tagCompound the compound to be set to the item
+     */
+    public static void setTag(Object nmsItem, Object tagCompound) {
+        try {
+            nmsItemStack_setTag.invoke(nmsItem, tagCompound);
+        } catch (IllegalAccessException
+                | InvocationTargetException ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
+
 }
