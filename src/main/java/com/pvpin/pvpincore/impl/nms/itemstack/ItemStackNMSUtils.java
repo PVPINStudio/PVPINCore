@@ -69,14 +69,31 @@ public class ItemStackNMSUtils extends NMSUtils {
     }
 
     /**
-     * @param stack ItemStack object
+     * @param stack ItemStack object in Bukkit
      * @return ItemStack object in NMS
      */
     public static Object getNMSItemStackCopy(ItemStack stack) {
         Object ret = null;
         try {
             ret = obcItemStack_asNMSCopy.invoke(null, stack);
-            //直接调用静态方法
+            // Call static method directly.
+        } catch (IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException ex) {
+            PVPINLogManager.log(ex);
+        }
+        return ret;
+    }
+
+    /**
+     * @param stack ItemStack object in NMS
+     * @return ItemStack object in Bukkit
+     */
+    public static Object getBukkitItemStackCopy(Object stack) {
+        Object ret = null;
+        try {
+            ret = obcItemStack_asBukkitCopy.invoke(null, stack);
+            // Call static method directly.
         } catch (IllegalAccessException
                 | IllegalArgumentException
                 | InvocationTargetException ex) {
