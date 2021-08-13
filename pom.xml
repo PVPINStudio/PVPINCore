@@ -210,7 +210,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${basedir}/src/main/resources/assembly-demo-jar.xml</descriptor>
+                                <descriptor>src/main/Resources/assembly-demo-jar.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
@@ -401,7 +401,7 @@
                 <filtering>false</filtering>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main/Resources</directory>
                 <includes>
                     <include>**/*.*</include>
                 </includes>
