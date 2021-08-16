@@ -22,12 +22,10 @@
  */
 package com.pvpin.pvpincore.api;
 
-import com.pvpin.pvpincore.impl.translation.TranslationEntityType;
-import com.pvpin.pvpincore.impl.translation.TranslationMaterial;
-import com.pvpin.pvpincore.impl.translation.TranslationPotionEffectType;
-import com.pvpin.pvpincore.impl.translation.TranslationSound;
+import com.pvpin.pvpincore.impl.translation.*;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -63,6 +61,28 @@ public class PVPINTranslation {
      */
     public static String getLocalizedName(Player player, Material mat) {
         return getLocalizedName(player.getLocale(), mat);
+    }
+
+    /**
+     * This method is used to get enchantment translations.
+     *
+     * @param locale target locale
+     * @param ench   enchantment to be translated
+     * @return the official translation of the enchantment
+     */
+    public static String getLocalizedName(String locale, Enchantment ench) {
+        return TranslationEnchantment.getLocalizedName(locale, ench);
+    }
+
+    /**
+     * This method is used to get enchantment translations.
+     *
+     * @param player target locale (of the player)
+     * @param ench   enchantment to be translated
+     * @return the official translation of the enchantment
+     */
+    public static String getLocalizedName(Player player, Enchantment ench) {
+        return getLocalizedName(player.getLocale(), ench);
     }
 
     /**

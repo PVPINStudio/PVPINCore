@@ -22,57 +22,51 @@
  */
 package com.pvpin.pvpincore.impl.translation;
 
-import static com.pvpin.pvpincore.impl.translation.TranslationManager.getEN_USName;
-import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_CNName;
-import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_TWName;
-
-import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.api.PVPINLogManager;
-
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import com.pvpin.pvpincore.impl.nms.NMSUtils;
+import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import net.md_5.bungee.api.chat.TranslatableComponent;
+import org.bukkit.enchantments.Enchantment;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
-import net.md_5.bungee.api.chat.TranslatableComponent;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionEffectTypeWrapper;
+import static com.pvpin.pvpincore.impl.translation.TranslationManager.*;
+import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 
 /**
  * @author William_Shi
  */
-public class TranslationPotionEffectType {
-
-    protected static String getMojangKey(PotionEffectType type) {
+public class TranslationEnchantment {
+    protected static String getMojangKey(Enchantment ench) {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            return "effect.minecraft." + PotionTypeTranslationNBTUtils.getPotionEffectTypeKey(type);
+            return "enchantment.minecraft." + EnchantmentTranslationNBTUtils.getEnchantmentKey(ench);
         } else {
-            return "effect." + PotionTypeTranslationNBTUtils.getPotionEffectTypeKey(type);
+            return "enchantment." + EnchantmentTranslationNBTUtils.getEnchantmentKey(ench);
         }
     }
 
     /**
      * @param locale locale type
-     * @param type   potion effect type
+     * @param ench   enchantment type
      * @return localized name
      */
-    public static String getLocalizedName(String locale, PotionEffectType type) {
+    public static String getLocalizedName(String locale, Enchantment ench) {
         String str = null;
         switch (locale) {
             case "zh_cn": {
-                str = getZH_CNName(getMojangKey(type));
+                str = getZH_CNName(getMojangKey(ench));
                 break;
             }
             case "zh_tw": {
-                str = getZH_TWName(getMojangKey(type));
+                str = getZH_TWName(getMojangKey(ench));
                 break;
             }
             case "en_us": {
-                str = getEN_USName(getMojangKey(type));
+                str = getEN_USName(getMojangKey(ench));
                 break;
             }
         }
@@ -80,8 +74,8 @@ public class TranslationPotionEffectType {
         return str;
     }
 
-    public static TranslatableComponent getTextComponent(PotionEffectType type) {
-        return new TranslatableComponent(getMojangKey(type));
+    public static TranslatableComponent getTextComponent(Enchantment ench) {
+        return new TranslatableComponent(getMojangKey(ench));
     }
 
 }
@@ -90,28 +84,28 @@ public class TranslationPotionEffectType {
  * @author William_Shi
  */
 @PVPINLoadOnEnable
-class PotionTypeTranslationNBTUtils extends NMSUtils {
+class EnchantmentTranslationNBTUtils extends NMSUtils {
 
-    protected static Class<?> nmsMobEffectList;
-    protected static Class<?> obcPotionEffectType;
+    protected static Class<?> nmsEnchantment;
+    protected static Class<?> obcEnchantment;
 
-    protected static Method obcPotionEffectType_getHandle;
-    protected static Object nmsIRegistry_MobEffectList;
+    protected static Method obcEnchantment_getRaw;
+    protected static Object nmsIRegistry_Enchantment;
 
     static {
         try {
-            nmsMobEffectList = Class.forName("net.minecraft.server." + version + ".MobEffectList");
-            obcPotionEffectType = Class.forName("org.bukkit.craftbukkit." + version + ".potion.CraftPotionEffectType");
-            obcPotionEffectType_getHandle = obcPotionEffectType.getMethod("getHandle");
+            nmsEnchantment = Class.forName("net.minecraft.server." + version + ".Enchantment");
+            obcEnchantment = Class.forName("org.bukkit.craftbukkit." + version + ".enchantments.CraftEnchantment");
+            obcEnchantment_getRaw = obcEnchantment.getMethod("getRaw", Enchantment.class);
 
             Arrays.stream(nmsIRegistry.getDeclaredFields()).forEach(
                     action -> {
-                        if (action.getGenericType().getTypeName().contains(nmsMobEffectList.getName())) {
+                        if (action.getGenericType().getTypeName().contains(nmsEnchantment.getName())) {
                             if (action.getGenericType() instanceof ParameterizedType) {
                                 ParameterizedType type = (ParameterizedType) action.getGenericType();
                                 if (type.getRawType().getTypeName().contains(nmsIRegistry.getName())) {
                                     try {
-                                        nmsIRegistry_MobEffectList = action.get(null);
+                                        nmsIRegistry_Enchantment = action.get(null);
                                     } catch (IllegalAccessException ex) {
                                         PVPINLogManager.log(ex);
                                     }
@@ -127,15 +121,11 @@ class PotionTypeTranslationNBTUtils extends NMSUtils {
         }
     }
 
-    public static String getPotionEffectTypeKey(PotionEffectType type) {
+    public static String getEnchantmentKey(Enchantment ench) {
         String ret = null;
         try {
-            Object type0 = null;
-            if (type instanceof PotionEffectTypeWrapper) {
-                type0 = ((PotionEffectTypeWrapper) type).getType();
-            }
-            Object mobEffectList = obcPotionEffectType_getHandle.invoke(type0);
-            Object minecraftKey = nmsIRegistry_getKey.invoke(nmsIRegistry_MobEffectList, mobEffectList);
+            Object nmsEnch = obcEnchantment_getRaw.invoke(null, ench);
+            Object minecraftKey = nmsIRegistry_getKey.invoke(nmsIRegistry_Enchantment, nmsEnch);
             ret = (String) nmsMinecraftKey_getKey.invoke(minecraftKey);
         } catch (IllegalAccessException
                 | IllegalArgumentException
