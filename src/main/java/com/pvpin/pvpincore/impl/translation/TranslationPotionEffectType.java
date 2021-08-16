@@ -49,9 +49,9 @@ public class TranslationPotionEffectType {
 
     protected static String getMojangKey(PotionEffectType type) {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            return "effect.minecraft." + PotionTypeTranslationNBTUtils.getPotionEffectTypeKey(type);
+            return "effect.minecraft." + PotionTypeTranslationNMSUtils.getPotionEffectTypeKey(type);
         } else {
-            return "effect." + PotionTypeTranslationNBTUtils.getPotionEffectTypeKey(type);
+            return "effect." + PotionTypeTranslationNMSUtils.getPotionEffectTypeKey(type);
         }
     }
 
@@ -90,7 +90,7 @@ public class TranslationPotionEffectType {
  * @author William_Shi
  */
 @PVPINLoadOnEnable
-class PotionTypeTranslationNBTUtils extends NMSUtils {
+class PotionTypeTranslationNMSUtils extends NMSUtils {
 
     protected static Class<?> nmsMobEffectList;
     protected static Class<?> obcPotionEffectType;
@@ -130,7 +130,7 @@ class PotionTypeTranslationNBTUtils extends NMSUtils {
     public static String getPotionEffectTypeKey(PotionEffectType type) {
         String ret = null;
         try {
-            Object type0 = null;
+            Object type0 = type;
             if (type instanceof PotionEffectTypeWrapper) {
                 type0 = ((PotionEffectTypeWrapper) type).getType();
             }

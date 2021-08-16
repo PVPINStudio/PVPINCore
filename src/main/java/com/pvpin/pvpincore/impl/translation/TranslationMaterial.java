@@ -52,9 +52,9 @@ public class TranslationMaterial {
             ItemStack stack = new ItemStack(material);
             Object nmsItem = ItemStackNMSUtils.getNMSItemStackCopy(stack);
             if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-                return ItemStackTranslationNBTUtils.getItemStackNameOrKey(nmsItem);
+                return ItemStackTranslationNMSUtils.getItemStackNameOrKey(nmsItem);
             } else {
-                return ItemStackTranslationNBTUtils.getItemStackNameOrKey(nmsItem) + ".name";
+                return ItemStackTranslationNMSUtils.getItemStackNameOrKey(nmsItem) + ".name";
             }
         } else {
             if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
@@ -100,7 +100,7 @@ public class TranslationMaterial {
  * @author William_Shi
  */
 @PVPINLoadOnEnable
-class ItemStackTranslationNBTUtils extends ItemStackNMSUtils {
+class ItemStackTranslationNMSUtils extends ItemStackNMSUtils {
 
     protected static Method nmsItem_getName;
 

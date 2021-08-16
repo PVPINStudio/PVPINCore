@@ -28,6 +28,7 @@ import com.pvpin.pvpincore.impl.nms.entity.EntityNMSUtils;
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getEN_USName;
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_CNName;
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_TWName;
+import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.utils.VersionChecker;
@@ -37,8 +38,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -48,13 +52,7 @@ public class TranslationEntityType {
 
     protected static String getMojangKey(EntityType type) {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            try {
-                return EntityTypeTranslationNMSUtils.getEntityNameOrKey(type);
-            } catch (IllegalArgumentException expected) {
-                // When trying to spawn hanging entities.
-                // When trying to spawn players or fishing hooks.
-            }
-            return "null";
+            return "entity.minecraft." + EntityTypeTranslationNMSUtils.getEntityNameOrKey(type);
         } else {
             return "entity." + EntityTypeTranslationNMSUtils.getEntityNameOrKey(type) + ".name";
         }
@@ -97,29 +95,36 @@ public class TranslationEntityType {
 @PVPINLoadOnEnable
 class EntityTypeTranslationNMSUtils extends EntityNMSUtils {
 
-    protected static final Random ran;
+    protected static Class<?> nmsRegistryBlocks;
 
-    protected static Method nmsEntity_getName;
-    protected static Method nmsEntityTypes_getName;
+    protected static Method nmsRegistryBlocks_get;
+
+    protected static Object nmsIRegistry_EntityTypes;
 
     static {
-        ran = new Random();
         try {
-            if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-                nmsEntity_getEntityType = nmsEntity.getMethod("getEntityType");
-                // 1.13 or above.
-                for (Method method : nmsEntityTypes.getMethods()) {
-                    if (method.getAnnotatedReturnType().getType().getTypeName().toString().toLowerCase().contains("component")) {
-                        nmsEntityTypes_getName = method;
-                        // 1.13 or above.
-                        break;
+            nmsRegistryBlocks = Class.forName("net.minecraft.server." + version + ".RegistryBlocks");
+
+            nmsRegistryBlocks_get = nmsRegistryBlocks.getMethod("get", nmsMinecraftKey);
+
+            Arrays.stream(nmsIRegistry.getDeclaredFields()).forEach(
+                    action -> {
+                        if (action.getGenericType().getTypeName().contains(nmsEntityTypes.getName())) {
+                            if (action.getGenericType() instanceof ParameterizedType) {
+                                ParameterizedType type = (ParameterizedType) action.getGenericType();
+                                if (type.getRawType().getTypeName().contains("Registry")) {
+                                    try {
+                                        nmsIRegistry_EntityTypes = action.get(null);
+                                    } catch (IllegalAccessException ex) {
+                                        PVPINLogManager.log(ex);
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-            } else {
-                nmsEntity_getName = nmsEntity.getMethod("getName");
-                // 1.12.
-            }
-        } catch (Exception ex) {
+            );
+        } catch (ClassNotFoundException
+                | NoSuchMethodException ex) {
             PVPINLogManager.log(ex);
         }
     }
@@ -129,39 +134,19 @@ class EntityTypeTranslationNMSUtils extends EntityNMSUtils {
      * @return translation key, such as entity.minecraft.sheep
      */
     public static String getEntityNameOrKey(EntityType type) {
-        String[] ret = new String[1];
-        Location ranLoc = new Location(Bukkit.getWorlds().get(0), ran.nextInt(16), 2, ran.nextInt(16));
-        ranLoc.getChunk().load();
-        Entity en = Bukkit.getWorlds().get(0).spawnEntity(ranLoc, type);
-        if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            ranLoc.getChunk().setForceLoaded(true);
-            try {
-                Object nmsEn = getNMSEntity(en);
-                Object nmsType = nmsEntity_getEntityType.invoke(nmsEn);
-                String component = nmsEntityTypes_getName.invoke(nmsType).toString();
-                ret[0] = component.split("'")[1];
-                // Above 1.13, use EntityTypes to get.
-            } catch (IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException ex) {
-                PVPINLogManager.log(ex);
-            } finally {
-                en.remove();
-                // Kill after use.
-            }
-        } else {
-            try {
-                Object nmsEn = getNMSEntity(en);
-                ret[0] = (String) nmsEntity_getName.invoke(nmsEn);
-            } catch (IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException ex) {
-                PVPINLogManager.log(ex);
-            } finally {
-                en.remove();
-                // Kill the entity after use.
-            }
+        String ret = null;
+        try {
+            Constructor cons = nmsMinecraftKey.getConstructor(String.class);
+            Object key = cons.newInstance(type.getKey().getKey());
+            Object entityTypes = nmsRegistryBlocks_get.invoke(nmsIRegistry_EntityTypes, key);
+            Object minecraftKey = nmsIRegistry_getKey.invoke(nmsIRegistry_EntityTypes, entityTypes);
+            ret = (String) nmsMinecraftKey_getKey.invoke(minecraftKey);
+        } catch (NoSuchMethodException
+                | InvocationTargetException
+                | InstantiationException
+                | IllegalAccessException ex) {
+            PVPINLogManager.log(ex);
         }
-        return ret[0];
+        return ret;
     }
 }

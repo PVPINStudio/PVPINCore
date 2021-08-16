@@ -43,9 +43,9 @@ import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 public class TranslationEnchantment {
     protected static String getMojangKey(Enchantment ench) {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
-            return "enchantment.minecraft." + EnchantmentTranslationNBTUtils.getEnchantmentKey(ench);
+            return "enchantment.minecraft." + EnchantmentTranslationNMSUtils.getEnchantmentKey(ench);
         } else {
-            return "enchantment." + EnchantmentTranslationNBTUtils.getEnchantmentKey(ench);
+            return "enchantment." + EnchantmentTranslationNMSUtils.getEnchantmentKey(ench);
         }
     }
 
@@ -84,7 +84,7 @@ public class TranslationEnchantment {
  * @author William_Shi
  */
 @PVPINLoadOnEnable
-class EnchantmentTranslationNBTUtils extends NMSUtils {
+class EnchantmentTranslationNMSUtils extends NMSUtils {
 
     protected static Class<?> nmsEnchantment;
     protected static Class<?> obcEnchantment;
