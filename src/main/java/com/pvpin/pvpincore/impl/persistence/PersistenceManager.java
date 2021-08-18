@@ -23,6 +23,7 @@
 package com.pvpin.pvpincore.impl.persistence;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.js.ClassChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Context;
@@ -47,15 +48,21 @@ public class PersistenceManager {
             if (ClassChecker.isLoadedByJavaScriptEngine()) {
                 Context cxt = Context.getCurrent();
                 for (AbstractHolder loaded : loadedHolders) {
-                    if (cxt.getBindings("js").getMember("name").asString().equals(loaded.namespace)
+                    if (cxt.getPolyglotBindings().getMember("name").asString().equals(loaded.namespace)
                             && loaded instanceof JSPersistenceHolder) {
+                        PVPINCore.getScriptManagerInstance().getPluginByName(
+                                cxt.getPolyglotBindings().getMember("name").asString()
+                        ).isValid();
                         return loaded;
                     }
                 }
                 // No loaded holders.
                 holder = new JSPersistenceHolder(
-                        cxt.getBindings("js").getMember("name").asString()
+                        cxt.getPolyglotBindings().getMember("name").asString()
                 );
+                PVPINCore.getScriptManagerInstance().getPluginByName(
+                        cxt.getPolyglotBindings().getMember("name").asString()
+                ).isValid();
                 loadedHolders.add(holder);
             } else {
                 StackTraceElement[] elements = Thread.currentThread().getStackTrace();

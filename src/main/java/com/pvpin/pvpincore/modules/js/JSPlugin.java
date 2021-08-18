@@ -55,10 +55,21 @@ public class JSPlugin {
                                     v -> new LinkedList<>(v.as(List.class)))
                             .build())
                     // https://github.com/oracle/graaljs/issues/214
-                    .allowAllAccess(true).build();
+                    .allowCreateProcess(false)
+                    .allowCreateThread(false)
+                    .allowIO(false)
+                    .allowEnvironmentAccess(EnvironmentAccess.INHERIT)
+                    .allowPolyglotAccess(PolyglotAccess.NONE)
+                    .allowNativeAccess(true)
+                    .allowHostClassLoading(true)
+                    .allowHostClassLookup(JSPluginAccessController::checkJSLookUpHostClass)
+                    .build();
             context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
             context.eval(Source.newBuilder(Source.findLanguage(file), file).build());
             this.logger = PVPINLogManager.getLogger(this.getName());
+            context.getPolyglotBindings().putMember("name", getName());
+            context.getPolyglotBindings().putMember("version", getVersion());
+            context.getPolyglotBindings().putMember("author", getAuthor());
             Thread.currentThread().setContextClassLoader(appCl);
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
@@ -82,16 +93,41 @@ public class JSPlugin {
         context.close(false);
     }
 
+    public boolean isValid(){
+        if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        if (!context.getPolyglotBindings().getMember("version").asString().equals(context.getBindings("js").getMember("version").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        if (!context.getPolyglotBindings().getMember("author").asString().equals(context.getBindings("js").getMember("author").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        return true;
+    }
+
     public String getName() {
-        return context.getBindings("js").getMember("name").asString();
+        if (!context.getPolyglotBindings().hasMember("name")) {
+            return context.getBindings("js").getMember("name").asString();
+        }
+        return context.getPolyglotBindings().getMember("name").asString();
     }
 
     public String getVersion() {
-        return context.getBindings("js").getMember("version").asString();
+        if (!context.getPolyglotBindings().hasMember("version")) {
+            return context.getBindings("js").getMember("version").asString();
+        }
+        return context.getPolyglotBindings().getMember("version").asString();
     }
 
     public String getAuthor() {
-        return context.getBindings("js").getMember("author").asString();
+        if (!context.getPolyglotBindings().hasMember("author")) {
+            return context.getBindings("js").getMember("author").asString();
+        }
+        return context.getPolyglotBindings().getMember("author").asString();
     }
 
     public File getSourceFile() {

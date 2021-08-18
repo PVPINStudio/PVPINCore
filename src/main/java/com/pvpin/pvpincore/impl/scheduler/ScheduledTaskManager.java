@@ -49,7 +49,8 @@ public class ScheduledTaskManager {
             throw new RuntimeException();
         }
         Context context = Context.getCurrent();
-        String pluginName = context.getBindings("js").getMember("name").asString();
+        String pluginName = context.getPolyglotBindings().getMember("name").asString();
+        PVPINCore.getScriptManagerInstance().getPluginByName(pluginName).isValid();
         return new TaskBuilder(PVPINCore.getScriptManagerInstance().getPluginByName(pluginName));
     }
 

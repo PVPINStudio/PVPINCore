@@ -22,7 +22,10 @@
  */
 package com.pvpin.pvpincore.api;
 
+import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.PVPINScriptManager;
 import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
+import org.graalvm.polyglot.Context;
 import org.slf4j.Logger;
 
 

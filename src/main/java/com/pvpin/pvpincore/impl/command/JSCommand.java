@@ -48,8 +48,9 @@ public class JSCommand implements TabExecutor {
         this.cmdCallback = cmdCallback;
         this.tabCallback = tabCallback;
         this.plugin = PVPINCore.getScriptManagerInstance().getPluginByName(
-                cmdCallback.getContext().getBindings("js").getMember("name").asString()
+                cmdCallback.getContext().getPolyglotBindings().getMember("name").asString()
         );
+        plugin.isValid();
     }
 
     @Override

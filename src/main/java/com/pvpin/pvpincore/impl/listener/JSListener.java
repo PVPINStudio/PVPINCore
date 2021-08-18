@@ -46,8 +46,9 @@ public class JSListener {
         this.ignoreCancelled = ignoreCancelled;
         this.callback = callback;
         this.plugin = PVPINCore.getScriptManagerInstance().getPluginByName(
-                callback.getContext().getBindings("js").getMember("name").asString()
+                callback.getContext().getPolyglotBindings().getMember("name").asString()
         );
+        plugin.isValid();
     }
 
     protected void call(Event event) {

@@ -30,31 +30,35 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.OptionHelper;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author William_Shi
  */
-@PVPINLoadOnEnable
 public class PVPINLoggerFactory {
 
-    protected static final Logger CORE_LOGGER;
-    protected static final HashMap<String, Logger> MAP = new HashMap<>(32);
-    protected static final DateFormat FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.SIMPLIFIED_CHINESE);
+    protected static Logger CORE_LOGGER = null;
+    protected static HashMap<String, Logger> MAP = new HashMap<>(32);
+    protected static DateFormat FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.SIMPLIFIED_CHINESE);
 
-    static {
+    public static void init() {
+        if (CORE_LOGGER != null) {
+            return;
+        }
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ((Logger)LoggerFactory.getLogger("org.apache")).setLevel(Level.OFF);
-        ((Logger)LoggerFactory.getLogger("org.apache.http.headers")).setLevel(Level.OFF);
-        ((Logger)LoggerFactory.getLogger("org.apache.http.wire")).setLevel(Level.OFF);
-        ((Logger)LoggerFactory.getLogger("org.eclipse.aether")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.apache")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.apache.http.headers")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.apache.http.wire")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.eclipse.aether")).setLevel(Level.OFF);
 
         CORE_LOGGER = (Logger) LoggerFactory.getLogger("CORE_LOGGER");
         MAP.put("CORE_LOGGER", CORE_LOGGER);

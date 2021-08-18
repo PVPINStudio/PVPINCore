@@ -24,20 +24,15 @@ package com.pvpin.pvpincore.impl.listener;
 
 import com.pvpin.pvpincore.api.PVPINListener;
 import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.PVPINPluginManager;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -58,67 +53,6 @@ import org.graalvm.polyglot.Value;
 @PVPINLoadOnEnable
 public class ListenerManager {
 
-    static {
-        try {
-            StackTraceElement trace = Thread.currentThread().getStackTrace()[7];
-            String JAR_PATH = Class.forName(trace.getClassName()).
-                    getProtectionDomain().getCodeSource().getLocation().getFile();
-            // Jar of the server core.
-
-            /*
-              Stack trace:
-              0 java.base/java.lang.Thread.getStackTrace(Thread.java:1606),
-              1 com.pvpin.pvpincore.impl.listener.ListenerInit.<clinit>(ListenerInit.java:55),
-              2 java.base/java.lang.Class.forName0(Native Method),
-              3 java.base/java.lang.Class.forName(Class.java:315),
-              4 com.pvpin.pvpincore.modules.PVPINCore.lambda$onEnable$0(PVPINCore.java:63),
-              5 java.base/java.util.ArrayList.forEach(ArrayList.java:1541),
-              6 com.pvpin.pvpincore.modules.PVPINCore.onEnable(PVPINCore.java:61),
-              7 org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:263)
-             */
-
-            ScanResult scanResult = new ClassGraph()
-                    .enableAllInfo()
-                    .acceptJars(
-                            JAR_PATH.split("/")[JAR_PATH.split("/").length - 1]
-                    )
-                    .acceptPackages("org.bukkit.event")
-                    .overrideClassLoaders(
-                            new URLClassLoader(
-                                    new URL[]{Class.forName(trace.getClassName())
-                                            .getProtectionDomain().getCodeSource().getLocation()}
-                                    // These 2 lines took me so long!
-                                    // 2021.7.16 William_Shi
-                            )
-                    )
-                    .scan();
-            scanResult.getAllClasses()
-                    .filter(classInfo -> classInfo.hasMethod("getHandlerList"))
-                    // Events that don't have a getHandlerlist method cannot be listened.
-                    // These events include BlockEvent, PlayerEvent, etc.
-                    // You can NOT listen all player events by listening PlayerEvent !!!
-                    // Also exclude those classes that are not events, such as EventPriority.
-                    .filter(classInfo -> !(classInfo.hasAnnotation(Deprecated.class.getName())))
-                    // Those deprecated events should not be used.
-                    // Because when registering them, the paper server will show warnings,
-                    // and we have five listeners for each event.
-                    // The warnings will spam the console.
-                    .forEach(action -> {
-                        try {
-                            String simple = action.getSimpleName();
-                            Class<?> listener = Class.forName("com.pvpin.pvpincore.impl.listener.listenerimpl." + simple + "Listener");
-                            Constructor cons = listener.getConstructor();
-                            Bukkit.getPluginManager().registerEvents((Listener) cons.newInstance(), PVPINCore.getCoreInstance());
-                        } catch (Exception expected) {
-                            // Do nothing
-                        }
-
-                    });
-        } catch (Exception ex) {
-            PVPINLogManager.log(ex);
-        }
-    }
-
     private static final Map<Class<?>, List> LOWEST = new HashMap<>(64);
     // LOWEST Priority Listeners
     private static final Map<Class<?>, List> LOW = new HashMap<>(32);
@@ -131,6 +65,8 @@ public class ListenerManager {
     // HIGHEST Priority Listeners
     private static final Map<Class<?>, List> MONITOR = new HashMap<>(64);
     // MONITOR Priority Listeners
+
+    private static final ListenerImpl LISTENER = new ListenerImpl();
 
     /**
      * This method is used to register listeners.
@@ -201,6 +137,78 @@ public class ListenerManager {
                 List list = new ArrayList();
                 list.add(new JSListener(cl, priority, ignoreCancelled, callback));
                 map.put(cl, list);
+
+                switch (priority) {
+                    case LOWEST: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.LOWEST,
+                                LISTENER.new LOWEST(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    case LOW: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.LOW,
+                                LISTENER.new LOW(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    case NORMAL: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.NORMAL,
+                                LISTENER.new NORMAL(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    case HIGH: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.HIGH,
+                                LISTENER.new HIGH(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    case HIGHEST: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.HIGHEST,
+                                LISTENER.new HIGHEST(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    case MONITOR: {
+                        Bukkit.getPluginManager().registerEvent(
+                                cl,
+                                LISTENER,
+                                EventPriority.MONITOR,
+                                LISTENER.new MONITOR(),
+                                PVPINCore.getCoreInstance(),
+                                ignoreCancelled
+                        );
+                        break;
+                    }
+                    default: {
+                        // The program will never get here.
+                    }
+                }
             }
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
@@ -220,7 +228,8 @@ public class ListenerManager {
                 // Stores all the elements to be deleted.
                 list.forEach(listener -> {
                     JSListener lis = (JSListener) listener;
-                    if (lis.callback.getContext().getBindings("js").getMember("name").asString().equals(pluginName)) {
+                    lis.plugin.isValid();
+                    if (lis.callback.getContext().getPolyglotBindings().getMember("name").asString().equals(pluginName)) {
                         temp.add(lis);
                     }
                 });

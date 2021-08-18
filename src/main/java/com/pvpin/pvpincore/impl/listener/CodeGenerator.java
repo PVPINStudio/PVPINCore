@@ -32,9 +32,11 @@ import java.net.URLClassLoader;
 
 /**
  * This class is used to generate .java files for listenimpl package.
+ * No longer needs it.
  *
  * @author William_Shi
  */
+@Deprecated
 public class CodeGenerator {
     // Template.txt
     private static final String TEMPLATE =

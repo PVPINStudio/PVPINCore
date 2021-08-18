@@ -34,6 +34,8 @@ import com.pvpin.pvpincore.modules.js.ClassChecker;
 import com.pvpin.pvpincore.modules.js.JSPlugin;
 import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
 import org.bukkit.event.EventPriority;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
@@ -48,6 +50,7 @@ import java.util.*;
 public class PVPINScriptManager {
 
     protected final Map<String, JSPlugin> MAP = new HashMap<>(32);
+    protected BukkitTask task = null;
 
     protected PVPINScriptManager() {
         // Used by main class PVPINCore only.
@@ -71,6 +74,18 @@ public class PVPINScriptManager {
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }
+        task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                List<String> temp = new ArrayList<>(16);
+                MAP.entrySet().forEach(entry -> {
+                    if (!entry.getValue().isValid()) {
+                        temp.add(entry.getKey());
+                    }
+                });
+                temp.forEach(MAP::remove);
+            }
+        }.runTaskTimer(PVPINCore.getCoreInstance(), 0, 60L);
     }
 
     /**
@@ -81,6 +96,9 @@ public class PVPINScriptManager {
             plugin.disable();
         });
         MAP.clear();
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     /**
@@ -175,7 +193,8 @@ public class PVPINScriptManager {
                 throw new IllegalAccessException();
             }
             Context cxt = Context.getCurrent();
-            String name = cxt.getBindings("js").getMember("name").asString();
+            String name = cxt.getPolyglotBindings().getMember("name").asString();
+            PVPINCore.getScriptManagerInstance().getPluginByName(name).isValid();
             PVPINLoggerFactory.getLoggerByName(name).info(msg);
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
