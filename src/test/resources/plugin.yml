@@ -3,8 +3,8 @@
 name: PVPINCoreDemo
 version: 1.0.0
 main: com.pvpin.pvpincore.demo.Main
-depend: [PVPINCore]
-authors: 
-    - Rain_Effect
-    - William_Shi
-    - MiaoWoo
+depend: [ PVPINCore ]
+authors:
+  - Rain_Effect
+  - William_Shi
+  - MiaoWoo

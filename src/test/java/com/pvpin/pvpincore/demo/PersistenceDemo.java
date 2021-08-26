@@ -11,9 +11,9 @@ import java.util.Map;
 public class PersistenceDemo {
     static {
         var dataMap = PVPINPersistence.getDataMap();
-        dataMap.put("JAVA","TEST");
-        dataMap.put("LIST", List.of(1D,2D,3D));
-        dataMap.put("MAP", Map.of("KEY",List.of("VALUE")));
+        dataMap.put("JAVA", "TEST");
+        dataMap.put("LIST", List.of(1D, 2D, 3D));
+        dataMap.put("MAP", Map.of("KEY", List.of("VALUE")));
         PVPINPersistence.saveToFile();
         PVPINPersistence.readFromFile();
         System.out.println(PVPINPersistence.getDataMap().toString());

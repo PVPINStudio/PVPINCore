@@ -45,7 +45,7 @@ public class TranslationEnchantment {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
             return "enchantment.minecraft." + EnchantmentTranslationNMSUtils.getEnchantmentKey(ench);
         } else {
-            return "enchantment." + EnchantmentTranslationNMSUtils.getEnchantmentKey(ench);
+            throw new RuntimeException("Not Finished Yet.");
         }
     }
 

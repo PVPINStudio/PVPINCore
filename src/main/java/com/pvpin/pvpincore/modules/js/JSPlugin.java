@@ -93,7 +93,7 @@ public class JSPlugin {
         context.close(false);
     }
 
-    public boolean isValid(){
+    public boolean isValid() {
         if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
             JSPluginAccessController.denyAccess(context);
             return false;

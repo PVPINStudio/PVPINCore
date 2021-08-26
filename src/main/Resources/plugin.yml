@@ -27,9 +27,9 @@ name: PVPINCore
 version: 1.0.0
 main: com.pvpin.pvpincore.modules.PVPINCore
 authors:
-    - William_Shi
-    - MiaoWoo
-    - Rain_Effect
-    - Eustia_Saint
+  - William_Shi
+  - MiaoWoo
+  - Rain_Effect
+  - Eustia_Saint
 
 api-version: 1.13

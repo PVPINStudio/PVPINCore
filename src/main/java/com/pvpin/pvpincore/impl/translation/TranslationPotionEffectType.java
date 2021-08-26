@@ -51,7 +51,7 @@ public class TranslationPotionEffectType {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
             return "effect.minecraft." + PotionTypeTranslationNMSUtils.getPotionEffectTypeKey(type);
         } else {
-            return "effect." + PotionTypeTranslationNMSUtils.getPotionEffectTypeKey(type);
+            throw new RuntimeException("Not Finished Yet.");
         }
     }
 

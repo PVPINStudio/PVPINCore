@@ -28,7 +28,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
  * @author William_Shi
  */
 @Retention(RetentionPolicy.RUNTIME)

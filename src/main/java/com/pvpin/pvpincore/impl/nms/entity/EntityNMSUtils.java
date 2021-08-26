@@ -27,13 +27,13 @@ import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 
 import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.entity.Entity;
 
 /**
- *
  * @author William_Shi
  */
 @PVPINLoadOnEnable

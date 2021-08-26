@@ -52,6 +52,7 @@ All `.js` files in that folder are loaded on start, and you may also enable/disa
 
 `/pvpincore js disable <Plugin Name>` -- unload a JavaScript plugin by name
 
-Due to safety concerns, all `pvpincore js` commands are currently only entitled to the console. NO player is allowed to execute them.
+Due to safety concerns, all `pvpincore js` commands are currently only entitled to the console. NO player is allowed to
+execute them.
 
 All the commands provide tab completes, so you won't need to check the file name / plugin name by yourself.

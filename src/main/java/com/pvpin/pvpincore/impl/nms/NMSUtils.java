@@ -23,6 +23,7 @@
 package com.pvpin.pvpincore.impl.nms;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.utils.VersionChecker;
 
 import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
 
@@ -54,17 +55,19 @@ public class NMSUtils {
     static {
         // Initialize reflections
         try {
-            nmsIRegistry = Class.forName("net.minecraft.server." + version + ".IRegistry");
-            nmsMinecraftKey = Class.forName("net.minecraft.server." + version + ".MinecraftKey");
+            if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
+                nmsIRegistry = Class.forName("net.minecraft.server." + version + ".IRegistry");
+                nmsMinecraftKey = Class.forName("net.minecraft.server." + version + ".MinecraftKey");
+
+                nmsIRegistry_getKey = nmsIRegistry.getMethod("getKey", Object.class);
+                nmsMinecraftKey_getKey = nmsMinecraftKey.getMethod("getKey");
+            }
 
             nmsNBTBase = Class.forName("net.minecraft.server." + version + ".NBTBase");
             nmsNBTTagCompound = Class.forName("net.minecraft.server." + version + ".NBTTagCompound");
             nmsNBTTagList = Class.forName("net.minecraft.server." + version + ".NBTTagList");
 
             nmsPacket = Class.forName("net.minecraft.server." + version + ".Packet");
-
-            nmsIRegistry_getKey = nmsIRegistry.getMethod("getKey", Object.class);
-            nmsMinecraftKey_getKey = nmsMinecraftKey.getMethod("getKey");
 
             nmsNBTTagCompound_hasKey = nmsNBTTagCompound.getMethod("hasKey", String.class);
             nmsNBTTagCompound_get = nmsNBTTagCompound.getMethod("get", String.class);

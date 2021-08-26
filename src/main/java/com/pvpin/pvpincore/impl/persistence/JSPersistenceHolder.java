@@ -37,7 +37,7 @@ class JSPersistenceHolder extends AbstractHolder {
     }
 
     @Override
-    public void saveToFile(){
+    public void saveToFile() {
         // The [] list in JavaScript is wrapped into a PolyglotMap.
         // As you can see, the PolyglotMap is not a list, but a map.
         // The map's keySet, values and entrySet are all empty.

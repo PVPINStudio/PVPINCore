@@ -115,6 +115,7 @@ class ItemStackTranslationNMSUtils extends ItemStackNMSUtils {
     /**
      * This method is used to get the translation key of an item.<p>
      * In 1.12, DiamondSword's key is swordDiamond, but in 1.13 its key is the same as its material.
+     *
      * @param nmsItem ItemStack object in NMS.
      * @return name of the material
      */
@@ -157,6 +158,7 @@ class BlockTranslationNMSUtils extends BlockNMSUtils {
     /**
      * This method is used to get the translation key of a block.<p>
      * In 1.12 IronOre's key is oreIron, but in 1.13 its key is the same as its material.
+     *
      * @param material material for the block
      * @return name of the material
      */

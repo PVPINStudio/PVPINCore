@@ -25,7 +25,6 @@ package com.pvpin.pvpincore.modules.utils;
 import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
 
 /**
- *
  * @author William_Shi
  */
 @PVPINLoadOnEnable
@@ -47,8 +46,8 @@ public class VersionChecker {
      * e.g. You may need to determine whether the server is running on 1.17,
      * to choose the right format of NMS class names.
      *
-     * @return true if the current server version is higher than the param version.
      * @param compare version to be compared, such as v1_13_R1.
+     * @return true if the current server version is higher than the param version.
      */
     public static boolean isCurrentHigherOrEquals(String compare) {
         if (compare.startsWith("v")) {

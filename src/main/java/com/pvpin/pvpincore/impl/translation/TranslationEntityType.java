@@ -54,7 +54,7 @@ public class TranslationEntityType {
         if (VersionChecker.isCurrentHigherOrEquals("v1_13_R0")) {
             return "entity.minecraft." + EntityTypeTranslationNMSUtils.getEntityNameOrKey(type);
         } else {
-            return "entity." + EntityTypeTranslationNMSUtils.getEntityNameOrKey(type) + ".name";
+            throw new RuntimeException("Not Finished Yet.");
         }
     }
 

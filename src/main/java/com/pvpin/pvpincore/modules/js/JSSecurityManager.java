@@ -63,6 +63,7 @@ public class JSSecurityManager extends SecurityManager {
         if (ClassChecker.isLoadedByJavaScriptEngine()) {
             boolean[] bool = new boolean[2];
             bool[0] = false;
+            bool[1] = false;
             StackTraceElement[] elements = Thread.currentThread().getStackTrace();
             Arrays.stream(elements).forEach(stackTraceElement -> {
                 if (stackTraceElement.toString().contains(PERSISTENCE)) {
