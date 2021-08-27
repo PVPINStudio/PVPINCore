@@ -43,6 +43,7 @@ public class SubCmdJS {
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!(sender instanceof ConsoleCommandSender)) {
             sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供后台使用。");
+            return true;
         }
         if (args.length == 1) {
             sender.sendMessage("========PVPINCore-JS指令========");
