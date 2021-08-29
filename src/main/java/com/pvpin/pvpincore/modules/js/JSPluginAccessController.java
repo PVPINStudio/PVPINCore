@@ -116,7 +116,7 @@ public class JSPluginAccessController {
             PVPINLoggerFactory.getCoreLogger().error(ex.getMessage(), ex);
             PVPINLoggerFactory.getCoreLogger().error("已阻止未授权的 JavaScript 操作");
             PVPINLoggerFactory.getCoreLogger().error("来源:" + cxt.getPolyglotBindings().getMember("name"));
-            PVPINLoggerFactory.getCoreLogger().error("源文件:" + PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString()));
+            PVPINLoggerFactory.getCoreLogger().error("源文件:" + PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString()).getSourceFile().getName());
         }
     }
 }

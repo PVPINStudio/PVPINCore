@@ -195,7 +195,7 @@ public class PVPINScriptManager {
             Context cxt = Context.getCurrent();
             String name = cxt.getPolyglotBindings().getMember("name").asString();
             PVPINCore.getScriptManagerInstance().getPluginByName(name).isValid();
-            PVPINLoggerFactory.getLoggerByName(name).info(msg);
+            PVPINLogManager.getLogger(name).info(msg);
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }

@@ -71,6 +71,7 @@ public class JSPlugin {
             context.getPolyglotBindings().putMember("version", getVersion());
             context.getPolyglotBindings().putMember("author", getAuthor());
             Thread.currentThread().setContextClassLoader(appCl);
+            this.logger.info(getName()+" has been loaded.");
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }

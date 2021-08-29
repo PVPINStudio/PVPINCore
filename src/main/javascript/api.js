@@ -28,6 +28,18 @@ function cancelTask(task) {
     task.cancel();
 }
 
+function getDataMap() {
+    return scriptManager.getDataMap();
+}
+
+function readPersistentDataFromFile() {
+    scriptManager.readPersistentDataFromFile();
+}
+
+function savePersistentDataToFile() {
+    scriptManager.savePersistentDataToFile();
+}
+
 function sendActionBar(player, msg) {
     Java.type("com.pvpin.pvpincore.impl.nms.entity.PlayerNMSUtils").sendActionBar(msg, player);
 }
