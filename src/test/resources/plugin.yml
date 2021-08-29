@@ -1,10 +1,11 @@
 ## YAML Template.
 ---
 name: PVPINCoreDemo
-version: 1.0.0
+version: 1.0.1
 main: com.pvpin.pvpincore.demo.Main
 depend: [ PVPINCore ]
 authors:
   - Rain_Effect
   - William_Shi
   - MiaoWoo
+  - Eustia_Saint

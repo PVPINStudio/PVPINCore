@@ -110,14 +110,13 @@ public class JSPluginAccessController {
      * @param cxt current context
      */
     public static void denyAccess(Context cxt) {
-        try {
-            throw new RuntimeException("Access Denied.");
-        } catch (Exception ex) {
-            PVPINLoggerFactory.getCoreLogger().error(ex.getMessage(), ex);
-            PVPINLoggerFactory.getCoreLogger().error("已阻止未授权的 JavaScript 操作");
+        PVPINLoggerFactory.getCoreLogger().error("已阻止未授权的 JavaScript 操作");
+        if (cxt.getPolyglotBindings().getMember("name") != null) {
             PVPINLoggerFactory.getCoreLogger().error("来源:" + cxt.getPolyglotBindings().getMember("name"));
             PVPINLoggerFactory.getCoreLogger().error("源文件:" + PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString()).getSourceFile().getName());
         }
+        cxt.getPolyglotBindings().putMember("close", true);
+        throw new RuntimeException("Access Denied.");
     }
 }
 

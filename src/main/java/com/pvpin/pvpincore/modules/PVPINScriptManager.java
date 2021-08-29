@@ -83,7 +83,7 @@ public class PVPINScriptManager {
                         temp.add(entry.getKey());
                     }
                 });
-                temp.forEach(MAP::remove);
+                temp.forEach(action -> PVPINCore.getScriptManagerInstance().disablePlugin(action));
             }
         }.runTaskTimer(PVPINCore.getCoreInstance(), 0, 60L);
     }

@@ -23,62 +23,84 @@
 package com.pvpin.pvpincore.modules.js;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
 import org.graalvm.polyglot.Context;
 
+import java.io.FileDescriptor;
 import java.util.Arrays;
 
 /**
  * @author William_Shi
  */
 public class JSSecurityManager extends SecurityManager {
-    String PERSISTENCE = "com.pvpin.pvpincore.impl.persistence";
+    static {
+        try {
+            Class.forName(JSPluginAccessController.class.getName());
+        } catch (ClassNotFoundException ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
+
+    private static final String PERSISTENCE = "com.pvpin.pvpincore.impl.persistence";
+
+    private void check() {
+        boolean[] bool = new boolean[2];
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        Arrays.stream(elements).forEach(stackTraceElement -> {
+            String name = stackTraceElement.toString();
+            if (name.contains("org.graalvm") || name.contains("com.oracle.truffle.polyglot")) {
+                bool[1] = true;
+            }
+            if (stackTraceElement.toString().contains(PERSISTENCE) ||
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Engine.<clinit>") ||
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Engine$ImplHolder.<clinit>") ||
+                    stackTraceElement.toString().contains("com.oracle.truffle.js.lang.JavaScriptLanguage.<clinit>") ||
+                    stackTraceElement.toString().contains("com.oracle.truffle.js.runtime.JSEngine.<clinit>") ||
+                    stackTraceElement.toString().contains("com.oracle.truffle.js.runtime.JSContext.<init>") ||
+                    stackTraceElement.toString().contains("com.oracle.truffle.js.runtime.JSRealm.<clinit>") ||
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Source$Builder.build") ||
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Context$Builder.build")) {
+                bool[0] = true;
+            }
+
+        });
+        if ((!bool[1]) || bool[0]) {
+            return;
+        }
+        JSPluginAccessController.denyAccess(Context.getCurrent());
+    }
 
     @Override
-    public void checkWrite(String file) {
-        if (ClassChecker.isLoadedByJavaScriptEngine()) {
-            boolean[] bool = new boolean[2];
-            bool[0] = false;
-            StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-            Arrays.stream(elements).forEach(stackTraceElement -> {
-                if (stackTraceElement.toString().contains(PERSISTENCE)) {
-                    bool[1] = true;
-                }
-                if (stackTraceElement.toString().contains("org.graalvm.polyglot.Value.execute")) {
-                    bool[0] = true;
-                }
-            });
-            if (bool[1]) {
-                return;
-            }
-            if (bool[0]) {
-                JSPluginAccessController.denyAccess(Context.getCurrent());
-            }
-        }
+    public void checkRead(FileDescriptor fd) {
+        super.checkRead(fd);
+        check();
     }
 
     @Override
     public void checkRead(String file) {
         super.checkRead(file);
-        if (ClassChecker.isLoadedByJavaScriptEngine()) {
-            boolean[] bool = new boolean[2];
-            bool[0] = false;
-            bool[1] = false;
-            StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-            Arrays.stream(elements).forEach(stackTraceElement -> {
-                if (stackTraceElement.toString().contains(PERSISTENCE)) {
-                    bool[1] = true;
-                }
-                if (stackTraceElement.toString().contains("org.graalvm.polyglot.Value.execute")) {
-                    bool[0] = true;
-                }
-            });
-            if (bool[1]) {
-                return;
-            }
-            if (bool[0]) {
-                JSPluginAccessController.denyAccess(Context.getCurrent());
-            }
-        }
+        check();
+    }
+
+    @Override
+    public void checkRead(String file, Object context) {
+        super.checkRead(file, context);
+        check();
+    }
+
+    @Override
+    public void checkWrite(FileDescriptor fd) {
+        super.checkWrite(fd);
+        check();
+    }
+
+    @Override
+    public void checkWrite(String file) {
+        super.checkWrite(file);
+        check();
+    }
+
+    @Override
+    public void checkDelete(String file) {
+        super.checkDelete(file);
     }
 }

@@ -28,6 +28,7 @@ import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.PVPINScriptManager;
 import org.graalvm.polyglot.*;
 import org.slf4j.Logger;
 
@@ -71,7 +72,7 @@ public class JSPlugin {
             context.getPolyglotBindings().putMember("version", getVersion());
             context.getPolyglotBindings().putMember("author", getAuthor());
             Thread.currentThread().setContextClassLoader(appCl);
-            this.logger.info(getName()+" has been loaded.");
+            this.logger.info(getName() + " has been loaded.");
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }
@@ -91,10 +92,13 @@ public class JSPlugin {
         CommandManager.unregisterJavaScriptCmds(this.getName());
         ScheduledTaskManager.cancelTasks(this.getName());
         PersistenceManager.getCurrentHolder().saveToFile();
-        context.close(false);
+        context.close(true);
     }
 
     public boolean isValid() {
+        if (context.getPolyglotBindings().hasMember("close")) {
+            return false;
+        }
         if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
             JSPluginAccessController.denyAccess(context);
             return false;

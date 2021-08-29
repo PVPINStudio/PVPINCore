@@ -50,7 +50,7 @@ public class PVPINLoggerFactory {
     protected static HashMap<String, Logger> MAP = new HashMap<>(32);
     protected static DateFormat FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.SIMPLIFIED_CHINESE);
 
-    public static void init() {
+    public static void loadLoggers() {
         if (CORE_LOGGER != null) {
             return;
         }

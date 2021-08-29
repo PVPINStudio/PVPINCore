@@ -56,13 +56,13 @@ public class PVPINCore extends JavaPlugin {
         scriptManagerInstance = new PVPINScriptManager();
 
         try {
-            PVPINLoggerFactory.init();
+            PVPINLoggerFactory.loadLoggers();
             // Logging is initialized first.
+            LibraryLoader.loadLibraries();
+            // Download libraries.
             Class.forName(VersionChecker.class.getName());
             // VersionChecker is used in many NMS related classes.
             // So load it before any NMSUtils subclass is loaded.
-            LibraryLoader.loadLibraries();
-            // Download libraries.
 
             this.saveResource("pvpin.policy", true);
             System.setProperty("java.security.policy", "file:/" + new File(this.getDataFolder(), "pvpin.policy").getAbsolutePath());
