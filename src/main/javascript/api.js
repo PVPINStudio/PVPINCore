@@ -5,7 +5,11 @@ function log(msg) {
 }
 
 function registerEventListener(eventType, priority, ignoreCancelled, callback) {
-    scriptManager.registerListener(eventType, priority, ignoreCancelled, callback);
+    return scriptManager.registerListener(eventType, priority, ignoreCancelled, callback);
+}
+
+function unregisterEventListener(listener) {
+    listener.unregister();
 }
 
 function registerCommand(name, cmdCallback, tabCallback) {

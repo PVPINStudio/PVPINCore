@@ -26,6 +26,7 @@ package com.pvpin.pvpincore.modules;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.api.PVPINPersistence;
 import com.pvpin.pvpincore.impl.command.CommandManager;
+import com.pvpin.pvpincore.impl.listener.JSListener;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
@@ -210,10 +211,11 @@ public class PVPINScriptManager {
      * @param priority        priority of the event
      * @param ignoreCancelled true if ignore cancelled events
      * @param callback        function to be executed when an event is called
+     * @return the listener registered (to unregister in the future)
      * @see ListenerManager#registerListener(String, EventPriority, boolean, Value)
      */
-    public void registerListener(String eventClass, EventPriority priority, boolean ignoreCancelled, Value callback) {
-        ListenerManager.registerListener(eventClass, priority, ignoreCancelled, callback);
+    public JSListener registerListener(String eventClass, EventPriority priority, boolean ignoreCancelled, Value callback) {
+        return ListenerManager.registerListener(eventClass, priority, ignoreCancelled, callback);
     }
 
     /**

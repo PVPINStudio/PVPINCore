@@ -30,6 +30,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.graalvm.polyglot.Value;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author William_Shi
  */
@@ -61,6 +65,17 @@ public class JSListener {
         } else {
             callback.execute(event);
         }
+    }
+
+    public void unregister(){
+        List<Map<Class<?>, List>> maps = List.of(ListenerManager.LOWEST, ListenerManager.LOW, ListenerManager.NORMAL, ListenerManager.HIGH, ListenerManager.HIGHEST, ListenerManager.MONITOR);
+        maps.forEach(map -> {
+            map.forEach((clazz, list) -> {
+                if(list.contains(this)){
+                    list.remove(this);
+                }
+            });
+        });
     }
 
 }

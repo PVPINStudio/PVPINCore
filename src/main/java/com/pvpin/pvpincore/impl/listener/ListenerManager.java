@@ -41,29 +41,32 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Value;
 
 /**
- * This class is used to register all listeners.<p>
- * Listeners in com.pvpin.pvpincore.listener.listenerimpl listen all the events in 1.16.5.<p>
- * If the server version is lower, there will be fewer events.<p>
- * So the server jar needs to be scanned to make certain all available events are listened.<p>
- * while those events that aren't available are NOT listened.<p>
- * Then the available events' listeners are registered.
+ * This class is used to register listeners for JavaScript plugins.<p>
+ * The maps LOWEST, LOW, NORMAL, HIGH, HIGHEST, and MONITOR are used to store the JSListeners and the event classes they listen.<p>
+ * The key is the event class to be listened.<p>
+ * The value is a list containing the JSListeners that listen the certain event(the key).<p>
+ * When registering a listener, first check whether the event to be listened exists in the map.<p>
+ * If exists, add the JSListener to the list of that event class.<p>
+ * If not, then register a new ListenerImpl to listen that event.<p>
+ * A ListenerImpl is used to listen a certain event and when the event happens, it calls ListenerManager#call.<p>
+ * The call method walks all the JSListeners of a certain event and calls them.
  *
  * @author William_Shi
  */
 @PVPINLoadOnEnable
 public class ListenerManager {
 
-    private static final Map<Class<?>, List> LOWEST = new HashMap<>(64);
+    protected static final Map<Class<?>, List> LOWEST = new HashMap<>(64);
     // LOWEST Priority Listeners
-    private static final Map<Class<?>, List> LOW = new HashMap<>(32);
+    protected static final Map<Class<?>, List> LOW = new HashMap<>(32);
     // LOW Priority Listeners
-    private static final Map<Class<?>, List> NORMAL = new HashMap<>(256);
+    protected static final Map<Class<?>, List> NORMAL = new HashMap<>(256);
     // NORMAL Priority Listeners
-    private static final Map<Class<?>, List> HIGH = new HashMap<>(32);
+    protected static final Map<Class<?>, List> HIGH = new HashMap<>(32);
     // HIGH Priority Listeners
-    private static final Map<Class<?>, List> HIGHEST = new HashMap<>(32);
+    protected static final Map<Class<?>, List> HIGHEST = new HashMap<>(32);
     // HIGHEST Priority Listeners
-    private static final Map<Class<?>, List> MONITOR = new HashMap<>(64);
+    protected static final Map<Class<?>, List> MONITOR = new HashMap<>(64);
     // MONITOR Priority Listeners
 
     private static final ListenerImpl LISTENER = new ListenerImpl();
@@ -97,7 +100,7 @@ public class ListenerManager {
      * @param ignoreCancelled true if ignore cancelled events
      * @param callback        function to be executed when an event is called
      */
-    public static void registerListener(String eventClass, EventPriority priority, boolean ignoreCancelled, Value callback) {
+    public static JSListener registerListener(String eventClass, EventPriority priority, boolean ignoreCancelled, Value callback) {
         Map<Class<?>, List> map = null;
         switch (priority) {
             case LOWEST: {
@@ -130,12 +133,13 @@ public class ListenerManager {
         }
         try {
             Class cl = Class.forName(eventClass);
+            JSListener newListener = new JSListener(cl, priority, ignoreCancelled, callback);
             if (map.containsKey(cl)) {
                 List list = map.get(cl);
-                list.add(new JSListener(cl, priority, ignoreCancelled, callback));
+                list.add(newListener);
             } else {
                 List list = new ArrayList();
-                list.add(new JSListener(cl, priority, ignoreCancelled, callback));
+                list.add(newListener);
                 map.put(cl, list);
 
                 switch (priority) {
@@ -210,9 +214,11 @@ public class ListenerManager {
                     }
                 }
             }
+            return newListener;
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }
+        return null;
     }
 
     /**
@@ -234,9 +240,7 @@ public class ListenerManager {
                     }
                 });
                 if (!temp.isEmpty()) {
-                    temp.forEach(listener -> {
-                        list.remove(listener);
-                    });
+                    temp.forEach(list::remove);
                 }
             });
         });

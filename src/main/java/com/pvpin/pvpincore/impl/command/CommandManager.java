@@ -177,9 +177,7 @@ public class CommandManager {
                 temp.add(action);
             }
         });
-        temp.forEach(action -> {
-            JAVASCRIPT_CMDS.remove(action);
-        });
+        temp.forEach(JAVASCRIPT_CMDS::remove);
     }
 
 }

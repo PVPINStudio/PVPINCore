@@ -29,6 +29,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 
 /**
+ * A ListenerImpl is used to listen a certain event and when the event happens, it calls ListenerManager#call.<p>
+ * The call method walks all the JSListeners of a certain event and calls them.
+ *
  * @author William_Shi
  */
 public class ListenerImpl implements Listener {
