@@ -4,6 +4,8 @@
 
 PVPINCore 是由 PVPINStudio 团队成员 `William_Shi`、 `Rain_Effect`、`MiaoWoo`、`Eustia_Saint` 共同开发的 Bukkit 插件。
 
+感谢 `ThatRarityEG` 在开发时提供的帮助。
+
 本插件提供了 JavaScript 代码的加载功能，并能加载用户编写的 JavaScript 插件。
 
 本插件提供了一系列 API 以供 JavaScript 调用，包括对于事件监听、指令、任务调度器、持久化等功能的简单封装。
@@ -13,6 +15,8 @@ PVPINCore 是由 PVPINStudio 团队成员 `William_Shi`、 `Rain_Effect`、`Miao
 本插件使用 GraalJS v21.2.0 并以此加载 JavaScript 代码。
 
 PVPINCore is a Bukkit Plugin developed by `William_Shi`, `Rain_Effect`, `MiaoWoo` and `Eustia_Saint` from PVPINStudio.
+
+A special thanks goes to `ThatRarityEG` in acknowledgement of her kind help. 
 
 This plugin can be used to load custom JavaScript plugins written by users.
 

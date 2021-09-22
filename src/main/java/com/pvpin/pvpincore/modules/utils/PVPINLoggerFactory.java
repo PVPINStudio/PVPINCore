@@ -27,11 +27,16 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.OutputStreamAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.OptionHelper;
 import com.pvpin.pvpincore.modules.PVPINCore;
 
+import java.io.BufferedOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -40,6 +45,7 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.LoggerFactory;
+import sun.misc.Unsafe;
 
 /**
  * @author William_Shi
@@ -98,12 +104,13 @@ public class PVPINLoggerFactory {
 
         PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
         consoleEncoder.setContext(context);
-        consoleEncoder.setPattern("%file:%line > %m%n");
+        consoleEncoder.setPattern("\r∞ PVPIN (%d{HH:mm}\\) >>> %m\n");
         consoleEncoder.start();
         ConsoleAppender consoleAppender = new ConsoleAppender();
         consoleAppender.setEncoder(consoleEncoder);
         consoleAppender.start();
         CORE_LOGGER.addAppender(consoleAppender);
+        hackConsoleAppender(consoleAppender);
 
     }
 
@@ -154,12 +161,30 @@ public class PVPINLoggerFactory {
 
         PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
         consoleEncoder.setContext(context);
-        consoleEncoder.setPattern("PVPIN > %m%n");
+        consoleEncoder.setPattern("\r∞ " + name + " (%d{HH:mm}\\) >>> %m\n");
         consoleEncoder.start();
         ConsoleAppender consoleAppender = new ConsoleAppender();
         consoleAppender.setEncoder(consoleEncoder);
         consoleAppender.start();
         logger.addAppender(consoleAppender);
+        hackConsoleAppender(consoleAppender);
         return logger;
+    }
+
+    private static void hackConsoleAppender(ConsoleAppender appender) {
+        try {
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            Unsafe unsafe = (Unsafe) theUnsafe.get(null);
+            Field module = Class.class.getDeclaredField("module");
+            long offset = unsafe.objectFieldOffset(module);
+            unsafe.putObject(PVPINLoggerFactory.class, offset, Object.class.getModule());
+
+            Field stream = OutputStreamAppender.class.getDeclaredField("outputStream");
+            stream.setAccessible(true);
+            stream.set(appender, new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
