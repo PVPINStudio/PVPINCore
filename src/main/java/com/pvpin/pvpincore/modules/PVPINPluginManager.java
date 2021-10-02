@@ -24,9 +24,9 @@ package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.api.PVPINListener;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
-import com.pvpin.pvpincore.modules.js.ClassChecker;
-import com.pvpin.pvpincore.modules.utils.ClassScanner;
+import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
+import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
+import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 
 import java.util.ArrayList;
@@ -59,8 +59,8 @@ public class PVPINPluginManager {
      * @throws Exception if the class calling this method does not exist (will never happen)
      */
     public void registerAll() throws Exception {
-        if (ClassChecker.isLoadedByJavaScriptEngine()) {
-            PVPINLoggerFactory.getCoreLogger().warn("JavaScript正在试图使用加载插件的方式加载自身！");
+        if (JSPluginAccessController.isLoadedByJavaScriptEngine()) {
+            PVPINLoggerFactory.getCoreLogger().warn("JavaScript 正在试图通过 PVPINCore 加载 Java 插件");
         }
         String pluginName = JavaPlugin.getProvidingPlugin(Class.forName(Thread.currentThread().getStackTrace()[2].getClassName())).getName();
         /*
@@ -74,7 +74,7 @@ public class PVPINPluginManager {
         } else {
             loaded.add(pluginName);
         }
-        ScanResult result = ClassScanner.scanClasses();
+        ScanResult result = scanClasses();
         ListenerManager.registerListener(result.getAllClasses().filter(
                 classInfo -> classInfo.hasAnnotation(PVPINListener.class.getName())
         ).loadClasses());
@@ -83,6 +83,35 @@ public class PVPINPluginManager {
         // Close manually.
         // Try-with is currently not used.
         PVPINLoggerFactory.getCoreLogger().info("JavaPlugin: " + pluginName + " 加载完毕");
+    }
+
+    protected ScanResult scanClasses() throws Exception {
+        StackTraceElement trace = Thread.currentThread().getStackTrace()[3];
+        /*
+         * 0 java.lang.Thread.getStackTrace
+         * 1 com.pvpin.pvpincore.modules.utils.ClassScanner.scanClasses
+         * 2 com.pvpin.pvpincore.modules.PVPINPluginManager.registerAll
+         * 3 Other Plugin
+         */
+        String path = Class.forName(trace.getClassName()).getProtectionDomain().getCodeSource().getLocation().getFile();
+        ScanResult scanResult = new ClassGraph()
+                .enableAllInfo()
+                .acceptJars(
+                        path.split("/")[path.split("/").length - 1]
+                )
+                .overrideClassLoaders(
+                        //new URLClassLoader(
+                        //        new URL[]{
+                        //            Class.forName(trace.getClassName()).getProtectionDomain().getCodeSource().getLocation()
+                        //        })
+                        Class.forName(trace.getClassName()).getClassLoader()
+                ).scan();
+        scanResult.getAllClasses().forEach(action -> {
+            // PVPINLoggerFactory.getCoreLogger().info("已扫描类{}", action.getName());
+            // Too much output if there are many classes
+        });
+
+        return scanResult;
     }
 
 }

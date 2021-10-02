@@ -22,9 +22,9 @@
  */
 package com.pvpin.pvpincore.impl.nms.nbt;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -33,7 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 /**
  * This class is used to do convertions between NMS NBTs, byte[] and Maps.

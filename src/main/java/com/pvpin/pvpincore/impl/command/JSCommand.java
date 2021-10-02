@@ -23,7 +23,8 @@
 package com.pvpin.pvpincore.impl.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.JSPlugin;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -41,7 +42,7 @@ public class JSCommand implements TabExecutor {
     protected String cmdName;
     protected Value cmdCallback;
     protected Value tabCallback;
-    protected JSPlugin plugin;
+    protected AbstractJSPlugin plugin;
 
     protected JSCommand(String cmdName, Value cmdCallback, Value tabCallback) {
         this.cmdName = cmdName;

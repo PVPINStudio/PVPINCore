@@ -24,7 +24,8 @@ package com.pvpin.pvpincore.impl.scheduler;
 
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.JSPlugin;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
 import org.graalvm.polyglot.Value;
 
 /**
@@ -32,12 +33,12 @@ import org.graalvm.polyglot.Value;
  */
 public class TaskBuilder {
 
-    protected JSPlugin plugin;
+    protected AbstractJSPlugin plugin;
     protected Value callback;
     protected Long interval = 0L;
     protected Long delay = 0L;
 
-    protected TaskBuilder(JSPlugin plugin) {
+    protected TaskBuilder(AbstractJSPlugin plugin) {
         this.plugin = plugin;
     }
 

@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.utils;
+package com.pvpin.pvpincore.impl.nms;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 
 /**
  * @author William_Shi

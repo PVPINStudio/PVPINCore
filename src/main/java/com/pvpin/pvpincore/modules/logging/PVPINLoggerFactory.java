@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.utils;
+package com.pvpin.pvpincore.modules.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -36,14 +36,12 @@ import com.pvpin.pvpincore.modules.PVPINCore;
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.logging.log4j.LogManager;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
@@ -55,6 +53,9 @@ public class PVPINLoggerFactory {
     protected static Logger CORE_LOGGER = null;
     protected static HashMap<String, Logger> MAP = new HashMap<>(32);
     protected static DateFormat FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.SIMPLIFIED_CHINESE);
+    private static final String LOG_FILE_PATTERN = "[%d{HH:mm:ss:SSS} (%file:%line %p\\)] %m%n";
+    private static final String LOG_CONSOLE_PATTERN = "\r∞ {NAME} (%d{HH:mm}\\) >>> %m%n";
+    private static final String LOG_CONSOLE_PATTERN_CORE = "\r∞ PVPIN (%d{HH:mm}\\) >>> %m%n";
 
     public static void loadLoggers() {
         if (CORE_LOGGER != null) {
@@ -95,7 +96,7 @@ public class PVPINLoggerFactory {
         policy.start();
         PatternLayoutEncoder encoder = new PatternLayoutEncoder();
         encoder.setContext(context);
-        encoder.setPattern("[%d{HH:mm:ss:SSS} (%file:%line %p\\)] %m%n");
+        encoder.setPattern(LOG_FILE_PATTERN);
         encoder.start();
         fileAppender.setRollingPolicy(policy);
         fileAppender.setEncoder(encoder);
@@ -104,7 +105,7 @@ public class PVPINLoggerFactory {
 
         PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
         consoleEncoder.setContext(context);
-        consoleEncoder.setPattern("\r∞ PVPIN (%d{HH:mm}\\) >>> %m\n");
+        consoleEncoder.setPattern(LOG_CONSOLE_PATTERN_CORE);
         consoleEncoder.start();
         ConsoleAppender consoleAppender = new ConsoleAppender();
         consoleAppender.setEncoder(consoleEncoder);
@@ -152,7 +153,7 @@ public class PVPINLoggerFactory {
         policy.start();
         PatternLayoutEncoder fileEncoder = new PatternLayoutEncoder();
         fileEncoder.setContext(context);
-        fileEncoder.setPattern("[%d{HH:mm:ss:SSS} (%file:%line %p\\)] %m%n");
+        fileEncoder.setPattern(LOG_FILE_PATTERN);
         fileEncoder.start();
         fileAppender.setRollingPolicy(policy);
         fileAppender.setEncoder(fileEncoder);
@@ -161,7 +162,7 @@ public class PVPINLoggerFactory {
 
         PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
         consoleEncoder.setContext(context);
-        consoleEncoder.setPattern("\r∞ " + name + " (%d{HH:mm}\\) >>> %m\n");
+        consoleEncoder.setPattern(LOG_CONSOLE_PATTERN.replace("{NAME}", name));
         consoleEncoder.start();
         ConsoleAppender consoleAppender = new ConsoleAppender();
         consoleAppender.setEncoder(consoleEncoder);
@@ -182,7 +183,7 @@ public class PVPINLoggerFactory {
 
             Field stream = OutputStreamAppender.class.getDeclaredField("outputStream");
             stream.setAccessible(true);
-            stream.set(appender, new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)));
+            stream.set(appender, new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

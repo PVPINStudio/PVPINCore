@@ -27,11 +27,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

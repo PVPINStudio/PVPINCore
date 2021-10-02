@@ -22,9 +22,9 @@
  */
 package com.pvpin.pvpincore.modules.js;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.bukkit.Bukkit;
@@ -92,6 +92,7 @@ public class JSPluginAccessController {
             }
         });
         return className.startsWith("com.pvpin.pvpincore") ||
+                className.startsWith("net.pvpin.graaljsbox") ||
                 className.startsWith("org.bukkit") ||
                 className.startsWith("net.minecraft") ||
                 className.startsWith("java") ||
@@ -113,10 +114,35 @@ public class JSPluginAccessController {
         PVPINLoggerFactory.getCoreLogger().error("已阻止未授权的 JavaScript 操作");
         if (cxt.getPolyglotBindings().getMember("name") != null) {
             PVPINLoggerFactory.getCoreLogger().error("来源:" + cxt.getPolyglotBindings().getMember("name"));
-            PVPINLoggerFactory.getCoreLogger().error("源文件:" + PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString()).getSourceFile().getName());
+            AbstractJSPlugin plugin = PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString());
+            if(plugin instanceof LocalFileJSPlugin){
+                PVPINLoggerFactory.getCoreLogger().error("源文件:" + ((LocalFileJSPlugin)plugin).getSourceFile().getName());
+            }else if(plugin instanceof StringJSPlugin){
+                PVPINLoggerFactory.getCoreLogger().error("执行插件的玩家:" + Bukkit.getOfflinePlayer(((StringJSPlugin)plugin).getPlayer()).getName());
+            }
         }
         cxt.getPolyglotBindings().putMember("close", true);
         throw new RuntimeException("Access Denied.");
+    }
+
+    /**
+     * This method is used to check if some method is called from JavaScript using Java.type
+     *
+     * @return true if loaded by JavaScript engine
+     */
+    public static boolean isLoadedByJavaScriptEngine() {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : elements) {
+            String name = element.toString();
+            if (name.contains("jdk.nashorn")
+                    || name.contains("org.graalvm")
+                    || name.contains("com.oracle.truffle.polyglot")
+                    || name.contains("org.mozilla.javascript")
+                    || name.contains("com.eclipsesource.v8")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

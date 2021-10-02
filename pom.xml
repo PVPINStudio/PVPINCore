@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pvpin.pvpincore</groupId>
     <artifactId>PVPINCore</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,6 +26,11 @@
         <repository>
             <id>yumc</id>
             <url>https://repo.yumc.pw</url>
+        </repository>
+        <repository>
+            <id>celestialrealm-graaljsbox-pvpinstudio</id>
+            <name>pvpinstudio</name>
+            <url>https://celestialrealm-maven.pkg.coding.net/repository/graaljsbox/pvpinstudio/</url>
         </repository>
         <repository>
             <id>mulesoft-public</id>
@@ -101,6 +106,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.graalvm.js/js -->
         <dependency>
             <groupId>org.graalvm.sdk</groupId>
             <artifactId>graal-sdk</artifactId>
@@ -119,6 +125,14 @@
             <version>21.2.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.pvpin.graaljsbox</groupId>
+            <artifactId>GraalJSBox</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.eclipse.aether/aether-api -->
         <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
@@ -250,8 +264,20 @@
                     </filters>
                     <relocations>
                         <relocation>
-                            <pattern>org.apache</pattern>
-                            <shadedPattern>shaded.apache.org.apache</shadedPattern>
+                            <pattern>org.apache.commons.codec</pattern>
+                            <shadedPattern>shaded.apache.org.apache.commons.codec</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache.commons.logging</pattern>
+                            <shadedPattern>shaded.logging.org.apache.commons.logging</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache.http</pattern>
+                            <shadedPattern>shaded.apache.org.apache.http</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache.maven</pattern>
+                            <shadedPattern>shaded.apache.org.apache.maven</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.aopalliance</pattern>

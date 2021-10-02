@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.pvpin.pvpincore</groupId>
   <artifactId>PVPINCore</artifactId>
-  <version>1.0.3</version>
+  <version>1.1.0</version>
   <licenses>
     <license>
       <name>MIT License</name>
@@ -85,8 +85,20 @@
           </filters>
           <relocations>
             <relocation>
-              <pattern>org.apache</pattern>
-              <shadedPattern>shaded.apache.org.apache</shadedPattern>
+              <pattern>org.apache.commons.codec</pattern>
+              <shadedPattern>shaded.apache.org.apache.commons.codec</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.commons.logging</pattern>
+              <shadedPattern>shaded.logging.org.apache.commons.logging</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.http</pattern>
+              <shadedPattern>shaded.apache.org.apache.http</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.maven</pattern>
+              <shadedPattern>shaded.apache.org.apache.maven</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.aopalliance</pattern>
@@ -229,6 +241,11 @@
     <repository>
       <id>yumc</id>
       <url>https://repo.yumc.pw</url>
+    </repository>
+    <repository>
+      <id>celestialrealm-graaljsbox-pvpinstudio</id>
+      <name>pvpinstudio</name>
+      <url>https://celestialrealm-maven.pkg.coding.net/repository/graaljsbox/pvpinstudio/</url>
     </repository>
     <repository>
       <id>mulesoft-public</id>

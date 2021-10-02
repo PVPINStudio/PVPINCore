@@ -20,12 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.command;
+package com.pvpin.pvpincore.modules.jsloader.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.PVPINScriptManager;
-import com.pvpin.pvpincore.modules.js.JSPlugin;
-import org.bukkit.Bukkit;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,7 +37,14 @@ import java.util.stream.Collectors;
 /**
  * @author William_Shi
  */
-public class SubCmdJS {
+public class SubCmdJSFile {
+    protected static void sendHelp(CommandSender sender) {
+        sender.sendMessage("========PVPINCore-JS指令========");
+        sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
+        sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
+        sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
+        sender.sendMessage("================================");
+    }
 
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!(sender instanceof ConsoleCommandSender)) {
@@ -46,11 +52,7 @@ public class SubCmdJS {
             return true;
         }
         if (args.length == 1) {
-            sender.sendMessage("========PVPINCore-JS指令========");
-            sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-            sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-            sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
-            sender.sendMessage("================================");
+            sendHelp(sender);
             return true;
         }
         switch (args[1].toLowerCase()) {
@@ -58,11 +60,7 @@ public class SubCmdJS {
                 // Command aliases.
             case "reload": {
                 if (args.length != 2) {
-                    sender.sendMessage("========PVPINCore-JS指令========");
-                    sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-                    sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-                    sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
-                    sender.sendMessage("================================");
+                    sendHelp(sender);
                     return true;
                 }
                 PVPINCore.getScriptManagerInstance().onReload();
@@ -70,11 +68,7 @@ public class SubCmdJS {
             }
             case "enable": {
                 if (args.length != 3) {
-                    sender.sendMessage("========PVPINCore-JS指令========");
-                    sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-                    sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-                    sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
-                    sender.sendMessage("================================");
+                    sendHelp(sender);
                     return true;
                 }
                 PVPINCore.getScriptManagerInstance().enablePlugin(
@@ -87,22 +81,14 @@ public class SubCmdJS {
             }
             case "disable": {
                 if (args.length != 3) {
-                    sender.sendMessage("========PVPINCore-JS指令========");
-                    sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-                    sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-                    sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
-                    sender.sendMessage("================================");
+                    sendHelp(sender);
                     return true;
                 }
                 PVPINCore.getScriptManagerInstance().disablePlugin(args[2]);
                 return true;
             }
             default: {
-                sender.sendMessage("========PVPINCore-JS指令========");
-                sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-                sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-                sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
-                sender.sendMessage("================================");
+                sendHelp(sender);
                 return true;
             }
         }
@@ -131,14 +117,14 @@ public class SubCmdJS {
             case "disable": {
                 List<String> result = new ArrayList();
                 PVPINCore.getScriptManagerInstance().getAllPlugins().forEach(action -> {
-                    result.add(((JSPlugin) action).getName());
+                    result.add(((AbstractJSPlugin) action).getName());
                 });
                 return result.stream().filter(
                         action -> action.toLowerCase().startsWith(args[2].toLowerCase())
                 ).collect(Collectors.toList());
             }
             default: {
-                return null;
+                return List.of();
             }
         }
     }

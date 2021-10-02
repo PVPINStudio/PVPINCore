@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.impl.scheduler;
 
-import com.pvpin.pvpincore.modules.js.JSPlugin;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.graalvm.polyglot.Value;
 
@@ -33,10 +34,10 @@ import org.graalvm.polyglot.Value;
  * @author William_Shi
  */
 public class JSScheduledTask extends BukkitRunnable {
-    protected JSPlugin plugin;
+    protected AbstractJSPlugin plugin;
     protected Value callback;
 
-    protected JSScheduledTask(JSPlugin plugin, Value callback) {
+    protected JSScheduledTask(AbstractJSPlugin plugin, Value callback) {
         this.plugin = plugin;
         this.callback = callback;
     }

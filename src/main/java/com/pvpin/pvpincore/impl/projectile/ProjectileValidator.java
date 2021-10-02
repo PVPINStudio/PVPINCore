@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.projectile;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Projectile;

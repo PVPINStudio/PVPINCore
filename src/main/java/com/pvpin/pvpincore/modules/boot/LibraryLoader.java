@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.utils;
+package com.pvpin.pvpincore.modules.boot;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.bukkit.Bukkit;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -47,7 +47,6 @@ import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
 import java.io.File;
@@ -58,7 +57,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * @author William_Shi

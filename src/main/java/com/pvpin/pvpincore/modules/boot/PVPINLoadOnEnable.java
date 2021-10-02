@@ -20,30 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.boot;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author William_Shi
  */
-public class ClassChecker {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface PVPINLoadOnEnable {
 
-    /**
-     * This method is used to check if some method is called from JavaScript using Java.type
-     *
-     * @return true if loaded by JavaScript engine
-     */
-    public static boolean isLoadedByJavaScriptEngine() {
-        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-        for (StackTraceElement element : elements) {
-            String name = element.toString();
-            if (name.contains("jdk.nashorn")
-                    || name.contains("org.graalvm")
-                    || name.contains("com.oracle.truffle.polyglot")
-                    || name.contains("org.mozilla.javascript")
-                    || name.contains("com.eclipsesource.v8")) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -29,15 +29,15 @@ import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_TWNa
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionEffectTypeWrapper;

@@ -20,15 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.command;
+package com.pvpin.pvpincore.modules.jsloader.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +42,11 @@ public class MainCommand implements TabExecutor {
             return true;
         }
         switch (args[0].toLowerCase()) {
+            case "eval": {
+                return SubCmdJSEval.onCommand(sender, command, s, args);
+            }
             case "js": {
-                return SubCmdJS.onCommand(sender, command, s, args);
+                return SubCmdJSFile.onCommand(sender, command, s, args);
             }
         }
         return true;
@@ -54,7 +55,7 @@ public class MainCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
         if (args.length == 0 || args.length == 1) {
-            List<String> first = List.of("js");
+            List<String> first = List.of("eval", "js");
             // The first arg
             if (args.length == 0) {
                 return first;
@@ -65,8 +66,11 @@ public class MainCommand implements TabExecutor {
             }
         }
         switch (args[0].toLowerCase()) {
+            case "eval": {
+                return SubCmdJSEval.onTabComplete(sender, command, s, args);
+            }
             case "js": {
-                return SubCmdJS.onTabComplete(sender, command, s, args);
+                return SubCmdJSFile.onTabComplete(sender, command, s, args);
             }
         }
         return null;

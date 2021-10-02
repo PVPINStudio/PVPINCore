@@ -32,15 +32,21 @@ This plugin uses GraalJS 21.2.0 to load JavaScript code.
 
 将已经编写好的 JavaScript 插件移动到该文件夹中，重启服务器即自动加载。
 
-同时也可以通过指令加载、卸载插件。处于安全考虑，目前仅允许服务器后台通过指令控制插件加载、卸载。
+同时也可以通过指令加载、卸载插件。处于安全考虑，目前仅允许服务器后台通过指令控制文件内插件的加载、卸载。
 
-`/pvpincore js reload` -- 重载所有 JavaScript 插件
+`/pvpincore js reload` -- 重载所有文件夹内 JavaScript 插件并卸载其他临时插件
 
-`/pvpincore js enable <文件名>` -- 加载指定 `.js` 文件
+`/pvpincore js enable <文件名>` -- 加载 `/js` 文件夹内指定 `.js` 文件
 
-`/pvpincore js disable <插件名>` -- 卸载指定插件
+`/pvpincore js disable <插件名>` -- 卸载已经加载的指定插件
 
-指令均提供补全功能，会自动检测 `js` 文件夹并提供文件名补全，但请勿采用文件软连接等方式向文件夹内添加文件，这样的文件无法被正常读取。
+指令均提供补全功能，会自动检测 `/js` 文件夹并提供文件名补全，但请勿采用文件软连接等方式向文件夹内添加文件，这样的文件无法被正常读取。
+
+指令也可用于临时运行一段 JavaScript 语句。
+
+`/pvpincore eval <JavaScript>` -- 执行一段JavaScript语句
+
+`/pvpincore eval` -- 读取手持成书中内容并作为一段JavaScript语句加载
 
 Download the plugin jar and put it into the `plugins` folder, and start the server.
 
@@ -60,3 +66,9 @@ Due to safety concerns, all `pvpincore js` commands are currently only entitled 
 execute them.
 
 All the commands provide tab completes, so you won't need to check the file name / plugin name by yourself.
+
+You may also temporarily load some JavaScript code using the following command:
+
+`/pvpincore eval <JavaScript>` -- Directly execute some JavaScript code.
+
+`/pvpincore eval` -- Reads the contents of the written book in the command sender's hand, and execute the string content as a piece of JavaScript code. 

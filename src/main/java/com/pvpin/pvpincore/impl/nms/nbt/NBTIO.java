@@ -23,16 +23,14 @@
 package com.pvpin.pvpincore.impl.nms.nbt;
 
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.zip.GZIPInputStream;
 
 /**
  * @author William_Shi

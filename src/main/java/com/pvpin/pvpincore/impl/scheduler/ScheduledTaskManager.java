@@ -23,7 +23,7 @@
 package com.pvpin.pvpincore.impl.scheduler;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.ClassChecker;
+import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
 import org.graalvm.polyglot.Context;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class ScheduledTaskManager {
      * @see TaskBuilder
      */
     public static TaskBuilder newTaskBuilder() {
-        if (!ClassChecker.isLoadedByJavaScriptEngine()) {
+        if (!JSPluginAccessController.isLoadedByJavaScriptEngine()) {
             throw new RuntimeException();
         }
         Context context = Context.getCurrent();

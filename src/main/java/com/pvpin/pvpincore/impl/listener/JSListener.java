@@ -23,14 +23,13 @@
 package com.pvpin.pvpincore.impl.listener;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.PVPINScriptManager;
-import com.pvpin.pvpincore.modules.js.JSPlugin;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.graalvm.polyglot.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class JSListener {
     protected EventPriority priority;
     protected boolean ignoreCancelled;
     protected Value callback;
-    protected JSPlugin plugin;
+    protected AbstractJSPlugin plugin;
 
     protected JSListener(Class<?> cl, EventPriority priority, boolean ignoreCancelled, Value callback) {
         this.callback = callback;

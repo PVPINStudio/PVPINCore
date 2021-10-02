@@ -31,10 +31,11 @@ import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.impl.scheduler.TaskBuilder;
-import com.pvpin.pvpincore.modules.js.ClassChecker;
-import com.pvpin.pvpincore.modules.js.JSPlugin;
-import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
+import com.pvpin.pvpincore.modules.js.*;
+import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.graalvm.polyglot.Context;
@@ -50,7 +51,7 @@ import java.util.*;
  */
 public class PVPINScriptManager {
 
-    protected final Map<String, JSPlugin> MAP = new HashMap<>(32);
+    protected final Map<String, AbstractJSPlugin> MAP = new HashMap<>(32);
     protected BukkitTask task = null;
 
     protected PVPINScriptManager() {
@@ -82,6 +83,8 @@ public class PVPINScriptManager {
                 MAP.entrySet().forEach(entry -> {
                     if (!entry.getValue().isValid()) {
                         temp.add(entry.getKey());
+                        // When the plugin is marked 'close' in JSPluginAccessController,
+                        // Or it is not valid (e.g. the executor player of a BookJSPlugin is offline).
                     }
                 });
                 temp.forEach(action -> PVPINCore.getScriptManagerInstance().disablePlugin(action));
@@ -124,7 +127,7 @@ public class PVPINScriptManager {
     }
 
     /**
-     * This method is used to load a JavaScript plugin by its name.
+     * This method is used to load a JavaScript plugin by its file.
      *
      * @param file the javascript file
      */
@@ -133,8 +136,8 @@ public class PVPINScriptManager {
             if (!file.exists()) {
                 throw new RuntimeException("No such file: " + file.getAbsolutePath());
             }
-            JSPlugin plugin = new JSPlugin(file);
-            PVPINLoggerFactory.getCoreLogger().info("正在加载JavaScriptPlugin: " + plugin.getName());
+            LocalFileJSPlugin plugin = new LocalFileJSPlugin(file);
+            PVPINLoggerFactory.getCoreLogger().info("正在加载JavaScriptPlugin: " + plugin.getName() + " 源文件" + plugin.getSourceFile().getName());
             if (plugin.getName().isBlank() || plugin.getName().isEmpty() || plugin.getName().endsWith(" ") || plugin.getName().startsWith(" ")) {
                 PVPINLoggerFactory.getCoreLogger().warn("加载" + plugin.getSourceFile().getName() + "失败，无法识别名称");
                 plugin.disable();
@@ -148,11 +151,89 @@ public class PVPINScriptManager {
                 plugin.disable();
             }
             if (MAP.containsKey(plugin.getName())) {
-                JSPlugin old = MAP.get(plugin.getName());
-                PVPINLoggerFactory.getCoreLogger().warn("重复加载JavaScriptPlugin ( " + old.getSourceFile().getName() + " & " + plugin.getSourceFile().getName() + " )");
-                PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion());
-                PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion());
-                PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                AbstractJSPlugin old = MAP.get(plugin.getName());
+                if (old instanceof LocalFileJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复自文件加载JavaScriptPlugin");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 源文件" + ((LocalFileJSPlugin) old).getSourceFile());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 源文件" + plugin.getSourceFile());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                } else if (old instanceof StringJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复自文件加载JavaScriptPlugin ( " + plugin.getSourceFile().getName() + " )");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 源文件" + plugin.getSourceFile());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                }
+                plugin.disable();
+            } else {
+                MAP.put(plugin.getName(), plugin);
+                plugin.enable();
+                PVPINLoggerFactory.getCoreLogger().info("JavaScriptPlugin: " + plugin.getName() + " 加载完毕");
+            }
+        } catch (Exception ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
+
+    /**
+     * This method is used to load a String JavaScript plugin.
+     *
+     * @param player the executor of the plugin
+     * @param src    the javascript code
+     */
+    public void enablePlugin(UUID player, String src) {
+        try {
+            if (src.isBlank() || src.isEmpty()) {
+                throw new RuntimeException("Invalid JavaScript Code.");
+            }
+            StringJSPlugin plugin = new StringJSPlugin(player, src);
+            PVPINLoggerFactory.getCoreLogger().info("正在加载JavaScriptPlugin: " + plugin.getName() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+            if (MAP.containsKey(plugin.getName())) {
+                AbstractJSPlugin old = MAP.get(plugin.getName());
+                if (old instanceof LocalFileJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复加载JavaScriptPlugin");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 源文件" + ((LocalFileJSPlugin) old).getSourceFile());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                } else if (old instanceof StringJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复加载JavaScriptPlugin");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                }
+                plugin.disable();
+            } else {
+                MAP.put(plugin.getName(), plugin);
+                plugin.enable();
+                PVPINLoggerFactory.getCoreLogger().info("JavaScriptPlugin: " + plugin.getName() + " 加载完毕");
+            }
+        } catch (Exception ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
+
+    /**
+     * This method is used to load a String JavaScript plugin.
+     *
+     * @param player the executor of the plugin
+     * @param src    the javascript code
+     */
+    public void enablePlugin(UUID player, BookMeta src) {
+        try {
+            BookJSPlugin plugin = new BookJSPlugin(player, src);
+            PVPINLoggerFactory.getCoreLogger().info("正在加载JavaScriptPlugin: " + plugin.getName() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+            if (MAP.containsKey(plugin.getName())) {
+                AbstractJSPlugin old = MAP.get(plugin.getName());
+                if (old instanceof LocalFileJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复加载JavaScriptPlugin");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 源文件" + ((LocalFileJSPlugin) old).getSourceFile());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                } else if (old instanceof StringJSPlugin) {
+                    PVPINLoggerFactory.getCoreLogger().warn("重复加载JavaScriptPlugin");
+                    PVPINLoggerFactory.getCoreLogger().warn("加载 " + old.getName() + " 版本" + old.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("忽略 " + plugin.getName() + " 版本" + plugin.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
+                    PVPINLoggerFactory.getCoreLogger().warn("名称重复的JavaScriptPlugin同时仅能加载一个！");
+                }
                 plugin.disable();
             } else {
                 MAP.put(plugin.getName(), plugin);
@@ -170,8 +251,8 @@ public class PVPINScriptManager {
      * @param name name of the plugin
      * @return js plugin of this name, or null if not found
      */
-    public JSPlugin getPluginByName(String name) {
-        return MAP.containsKey(name) ? MAP.get(name) : null;
+    public AbstractJSPlugin getPluginByName(String name) {
+        return MAP.getOrDefault(name, null);
     }
 
     /**
@@ -190,7 +271,7 @@ public class PVPINScriptManager {
      */
     public void log(String msg) {
         try {
-            if (!ClassChecker.isLoadedByJavaScriptEngine()) {
+            if (!JSPluginAccessController.isLoadedByJavaScriptEngine()) {
                 throw new IllegalAccessException();
             }
             Context cxt = Context.getCurrent();
@@ -258,7 +339,7 @@ public class PVPINScriptManager {
      * @see PVPINPersistence#getDataMap()
      */
     public Map getDataMap() {
-        if (ClassChecker.isLoadedByJavaScriptEngine()) {
+        if (JSPluginAccessController.isLoadedByJavaScriptEngine()) {
             return PersistenceManager.getCurrentHolder().getDataMap();
         }
         return null;

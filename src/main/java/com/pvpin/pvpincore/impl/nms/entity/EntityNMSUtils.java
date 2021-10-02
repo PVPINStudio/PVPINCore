@@ -24,9 +24,9 @@ package com.pvpin.pvpincore.impl.nms.entity;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.impl.persistence;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.ClassChecker;
+import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Context;
 
@@ -45,7 +45,7 @@ public class PersistenceManager {
     public static AbstractHolder getCurrentHolder() {
         AbstractHolder holder = null;
         try {
-            if (ClassChecker.isLoadedByJavaScriptEngine()) {
+            if (JSPluginAccessController.isLoadedByJavaScriptEngine()) {
                 Context cxt = Context.getCurrent();
                 for (AbstractHolder loaded : loadedHolders) {
                     if (cxt.getPolyglotBindings().getMember("name").asString().equals(loaded.namespace)

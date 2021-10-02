@@ -22,20 +22,17 @@
  */
 package com.pvpin.pvpincore.impl.translation;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.entity.EntityNMSUtils;
 
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getEN_USName;
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_CNName;
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_TWName;
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import net.md_5.bungee.api.chat.TranslatableComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +40,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * @author William_Shi

@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.translation;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.block.BlockNMSUtils;
 import com.pvpin.pvpincore.impl.nms.itemstack.ItemStackNMSUtils;
 
@@ -31,7 +31,7 @@ import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_CNNa
 import static com.pvpin.pvpincore.impl.translation.TranslationManager.getZH_TWName;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

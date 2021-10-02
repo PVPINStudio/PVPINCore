@@ -43,13 +43,12 @@ public class JSSecurityManager extends SecurityManager {
     private static final String PERSISTENCE = "com.pvpin.pvpincore.impl.persistence";
 
     private void check() {
-        boolean[] bool = new boolean[2];
+        if (!JSPluginAccessController.isLoadedByJavaScriptEngine()) {
+            return;
+        }
+        boolean[] bool = new boolean[1];
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         Arrays.stream(elements).forEach(stackTraceElement -> {
-            String name = stackTraceElement.toString();
-            if (name.contains("org.graalvm") || name.contains("com.oracle.truffle.polyglot")) {
-                bool[1] = true;
-            }
             if (stackTraceElement.toString().contains(PERSISTENCE) ||
                     stackTraceElement.toString().contains("org.graalvm.polyglot.Engine.<clinit>") ||
                     stackTraceElement.toString().contains("org.graalvm.polyglot.Engine$ImplHolder.<clinit>") ||
@@ -58,12 +57,14 @@ public class JSSecurityManager extends SecurityManager {
                     stackTraceElement.toString().contains("com.oracle.truffle.js.runtime.JSContext.<init>") ||
                     stackTraceElement.toString().contains("com.oracle.truffle.js.runtime.JSRealm.<clinit>") ||
                     stackTraceElement.toString().contains("org.graalvm.polyglot.Source$Builder.build") ||
-                    stackTraceElement.toString().contains("org.graalvm.polyglot.Context$Builder.build")) {
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Context$Builder.build") ||
+                    stackTraceElement.toString().contains("org.graalvm.polyglot.Source.findLanguage") ||
+                    stackTraceElement.toString().contains("ch.qos.logback.core.CoreConstants.<clinit>")) {
                 bool[0] = true;
             }
 
         });
-        if ((!bool[1]) || bool[0]) {
+        if (bool[0]) {
             return;
         }
         JSPluginAccessController.denyAccess(Context.getCurrent());
@@ -71,13 +72,13 @@ public class JSSecurityManager extends SecurityManager {
 
     @Override
     public void checkRead(FileDescriptor fd) {
-        super.checkRead(fd);
+        // super.checkRead(fd);
         check();
     }
 
     @Override
     public void checkRead(String file) {
-        super.checkRead(file);
+        // super.checkRead(file);
         check();
     }
 
@@ -102,5 +103,6 @@ public class JSSecurityManager extends SecurityManager {
     @Override
     public void checkDelete(String file) {
         super.checkDelete(file);
+        check();
     }
 }

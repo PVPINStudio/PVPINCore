@@ -23,8 +23,8 @@
 package com.pvpin.pvpincore.impl.nms.entity;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.pvpin.pvpincore.modules.utils.VersionChecker.version;
+import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
 /**
  * @author William_Shi

@@ -20,18 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.impl.nms;
+package com.pvpin.pvpincore.modules.js;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.bukkit.inventory.meta.BookMeta;
+
+import java.util.UUID;
 
 /**
  * @author William_Shi
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface PVPINLoadOnEnable {
+public class BookJSPlugin extends StringJSPlugin {
+    private BookMeta meta;
 
+    public BookJSPlugin(UUID player, BookMeta src) {
+        super(player, getContents(src));
+        this.meta = src;
+    }
+
+    private static String getContents(BookMeta meta) {
+        StringBuilder sb = new StringBuilder();
+        meta.getPages().forEach(sb::append);
+        String str =  sb.toString();
+        if(str.isBlank()||str.isEmpty()){
+            throw new RuntimeException("Invalid JavaScript Code.");
+        }
+        return str;
+    }
 }

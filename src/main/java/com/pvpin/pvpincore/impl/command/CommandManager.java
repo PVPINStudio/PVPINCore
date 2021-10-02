@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.command;
 
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
@@ -32,7 +32,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -45,12 +44,26 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Value;
+import sun.misc.Unsafe;
 
 /**
  * @author William_Shi
  */
 @PVPINLoadOnEnable
 public class CommandManager {
+
+    static {
+        try {
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            Unsafe unsafe = (Unsafe) theUnsafe.get(null);
+            Field module = Class.class.getDeclaredField("module");
+            long offset = unsafe.objectFieldOffset(module);
+            unsafe.putObject(CommandManager.class, offset, Object.class.getModule());
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
 
     protected static final List<JSCommand> JAVASCRIPT_CMDS = new ArrayList(32);
 

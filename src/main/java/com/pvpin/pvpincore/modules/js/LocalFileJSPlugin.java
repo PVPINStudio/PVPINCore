@@ -28,7 +28,6 @@ import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.PVPINScriptManager;
 import org.graalvm.polyglot.*;
 import org.slf4j.Logger;
 
@@ -39,47 +38,33 @@ import java.util.List;
 /**
  * @author William_Shi
  */
-public class JSPlugin {
-    private Context context;
+public class LocalFileJSPlugin extends AbstractJSPlugin {
     private File file;
-    private Logger logger;
 
-    public JSPlugin(File file) {
+    public LocalFileJSPlugin(File file) {
+        super();
         try {
-            ClassLoader appCl = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-            // Replace the AppClassLoader
             this.file = file;
-            this.context = Context.newBuilder("js")
-                    .allowHostAccess(HostAccess.newBuilder(HostAccess.ALL)
-                            .targetTypeMapping(Value.class, Object.class, Value::hasArrayElements,
-                                    v -> new LinkedList<>(v.as(List.class)))
-                            .build())
-                    // https://github.com/oracle/graaljs/issues/214
-                    .allowCreateProcess(false)
-                    .allowCreateThread(false)
-                    .allowIO(false)
-                    .allowEnvironmentAccess(EnvironmentAccess.INHERIT)
-                    .allowPolyglotAccess(PolyglotAccess.NONE)
-                    .allowNativeAccess(true)
-                    .allowHostClassLoading(true)
-                    .allowHostClassLookup(JSPluginAccessController::checkJSLookUpHostClass)
-                    .build();
-            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
             context.eval(Source.newBuilder(Source.findLanguage(file), file).build());
             this.logger = PVPINLogManager.getLogger(this.getName());
             context.getPolyglotBindings().putMember("name", getName());
             context.getPolyglotBindings().putMember("version", getVersion());
             context.getPolyglotBindings().putMember("author", getAuthor());
-            Thread.currentThread().setContextClassLoader(appCl);
             this.logger.info(getName() + " has been loaded.");
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }
     }
 
+    @Override
     public void enable() {
         try {
+            if(!context.getBindings("js").hasMember("main")){
+                throw new RuntimeException();
+            }
+            if(!context.getBindings("js").getMember("main").canExecute()){
+                throw new RuntimeException();
+            }
             Value func = context.getBindings("js").getMember("main");
             func.executeVoid();
         } catch (Exception ex) {
@@ -87,6 +72,7 @@ public class JSPlugin {
         }
     }
 
+    @Override
     public void disable() {
         ListenerManager.unregisterListener(this.getName());
         CommandManager.unregisterJavaScriptCmds(this.getName());
@@ -112,27 +98,6 @@ public class JSPlugin {
             return false;
         }
         return true;
-    }
-
-    public String getName() {
-        if (!context.getPolyglotBindings().hasMember("name")) {
-            return context.getBindings("js").getMember("name").asString();
-        }
-        return context.getPolyglotBindings().getMember("name").asString();
-    }
-
-    public String getVersion() {
-        if (!context.getPolyglotBindings().hasMember("version")) {
-            return context.getBindings("js").getMember("version").asString();
-        }
-        return context.getPolyglotBindings().getMember("version").asString();
-    }
-
-    public String getAuthor() {
-        if (!context.getPolyglotBindings().hasMember("author")) {
-            return context.getBindings("js").getMember("author").asString();
-        }
-        return context.getPolyglotBindings().getMember("author").asString();
     }
 
     public File getSourceFile() {
@@ -169,8 +134,8 @@ public class JSPlugin {
         if (another == this) {
             return true;
         }
-        if (another instanceof JSPlugin) {
-            JSPlugin plugin = (JSPlugin) another;
+        if (another instanceof LocalFileJSPlugin) {
+            LocalFileJSPlugin plugin = (LocalFileJSPlugin) another;
             return (this.getName().equals(plugin.getName()))
                     && (this.getVersion().equals(plugin.getVersion()))
                     && (this.getAuthor().equals(plugin.getAuthor()))

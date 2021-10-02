@@ -1,0 +1,147 @@
+/*
+ * The MIT License
+ * Copyright © 2020-2021 PVPINStudio
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package com.pvpin.pvpincore.modules.js;
+
+import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.impl.command.CommandManager;
+import com.pvpin.pvpincore.impl.listener.ListenerManager;
+import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
+import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
+import com.pvpin.pvpincore.modules.PVPINCore;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
+
+import java.util.UUID;
+
+/**
+ * @author William_Shi
+ */
+public class StringJSPlugin extends AbstractJSPlugin {
+    private UUID player;
+    private String src;
+
+    public StringJSPlugin(UUID player, String src) {
+        super();
+        this.player = player;
+        this.src = src;
+        String name = Bukkit.getOfflinePlayer(player).getName() + UUID.randomUUID();
+        String version = "0.0.1";
+        String author = Bukkit.getOfflinePlayer(player).getName();
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        context.getBindings("js").putMember("name", name);
+        context.getBindings("js").putMember("version", version);
+        context.getBindings("js").putMember("author", author);
+        context.getPolyglotBindings().putMember("name", getName());
+        context.getPolyglotBindings().putMember("version", getVersion());
+        context.getPolyglotBindings().putMember("author", getAuthor());
+
+        context.eval(Source.newBuilder("js", src, name).buildLiteral());
+        this.logger = PVPINLogManager.getLogger(this.getName());
+        Thread.currentThread().setContextClassLoader(appCl);
+    }
+
+    @Override
+    public void enable() {
+        if (context.getBindings("js").hasMember("main")) {
+            if (context.getBindings("js").getMember("main").canExecute()) {
+                Value func = context.getBindings("js").getMember("main");
+                func.executeVoid();
+            }
+        }
+        Player me = Bukkit.getOfflinePlayer(player).isOnline() ? Bukkit.getPlayer(player) : null;
+        context.getBindings("js").putMember("me", me);
+    }
+
+    @Override
+    public void disable() {
+        ListenerManager.unregisterListener(this.getName());
+        CommandManager.unregisterJavaScriptCmds(this.getName());
+        ScheduledTaskManager.cancelTasks(this.getName());
+        PersistenceManager.getCurrentHolder().saveToFile();
+        context.close(true);
+    }
+
+    @Override
+    public boolean isValid() {
+        if (context.getPolyglotBindings().hasMember("close")) {
+            return false;
+        }
+        if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        if (!context.getPolyglotBindings().getMember("version").asString().equals(context.getBindings("js").getMember("version").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        if (!context.getPolyglotBindings().getMember("author").asString().equals(context.getBindings("js").getMember("author").asString())) {
+            JSPluginAccessController.denyAccess(context);
+            return false;
+        }
+        return true;
+    }
+
+    public UUID getPlayer() {
+        return this.player;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Temp JavaScript Plugin: ");
+        sb.append(getName());
+        sb.append(" Version: ");
+        sb.append(getVersion());
+        sb.append(" Author(s):");
+        sb.append(getAuthor());
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.getName().hashCode();
+        result = 31 * result + this.getVersion().hashCode();
+        result = 31 * result + this.getAuthor().hashCode();
+        result = 31 * result + this.src.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        if (another == this) {
+            return true;
+        }
+        if (another instanceof StringJSPlugin) {
+            StringJSPlugin plugin = (StringJSPlugin) another;
+            return (this.getName().equals(plugin.getName()))
+                    && (this.getVersion().equals(plugin.getVersion()))
+                    && (this.getAuthor().equals(plugin.getAuthor()))
+                    && (this.src.equals(plugin.src));
+        }
+        return false;
+    }
+}

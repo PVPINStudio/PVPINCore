@@ -23,7 +23,7 @@
 package com.pvpin.pvpincore.impl.listener;
 
 import com.pvpin.pvpincore.api.PVPINListener;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.api.PVPINLogManager;
 
 import java.util.ArrayList;

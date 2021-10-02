@@ -23,21 +23,13 @@
 package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.impl.command.CommandManager;
-import com.pvpin.pvpincore.impl.nms.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.boot.BootStrap;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
-import com.pvpin.pvpincore.modules.command.MainCommand;
-import com.pvpin.pvpincore.modules.js.JSSecurityManager;
-import com.pvpin.pvpincore.modules.utils.LibraryLoader;
-import com.pvpin.pvpincore.modules.utils.PVPINLoggerFactory;
-import com.pvpin.pvpincore.modules.utils.VersionChecker;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
+import com.pvpin.pvpincore.modules.jsloader.command.MainCommand;
+import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.security.Policy;
 
 /**
  * @author William_Shi
@@ -56,33 +48,8 @@ public class PVPINCore extends JavaPlugin {
         scriptManagerInstance = new PVPINScriptManager();
 
         try {
-            PVPINLoggerFactory.loadLoggers();
-            // Logging is initialized first.
-            LibraryLoader.loadLibraries();
-            // Download libraries.
-            Class.forName(VersionChecker.class.getName());
-            // VersionChecker is used in many NMS related classes.
-            // So load it before any NMSUtils subclass is loaded.
-
-            this.saveResource("pvpin.policy", true);
-            System.setProperty("java.security.policy", "file:/" + new File(this.getDataFolder(), "pvpin.policy").getAbsolutePath());
-            Policy.getPolicy().refresh();
-            System.setSecurityManager(new JSSecurityManager());
-
-            try (ScanResult scanResult = new ClassGraph()
-                    .enableAllInfo()
-                    .acceptPackages("com.pvpin.pvpincore")
-                    .scan()) {
-                scanResult.getClassesWithAnnotation(PVPINLoadOnEnable.class.getName())
-                        .forEach(action -> {
-                            try {
-                                action.loadClass();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        });
-            }
-        } catch (ClassNotFoundException ex) {
+            BootStrap.boot();
+        } catch (Exception ex) {
             ex.printStackTrace();
             // Logger is not initialized yet.
         }
@@ -91,6 +58,7 @@ public class PVPINCore extends JavaPlugin {
         var mainCmd = new MainCommand();
         Bukkit.getPluginCommand("pvpincore").setExecutor(mainCmd);
         Bukkit.getPluginCommand("pvpincore").setTabCompleter(mainCmd);
+        // Register command /pvpincore.
 
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
         // Ignore the warning that the polyglot context is using an implementation
