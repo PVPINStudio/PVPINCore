@@ -68,7 +68,10 @@ public class SubCmdJSEval {
             return true;
         } else {
             StringBuilder sb = new StringBuilder();
-            Arrays.stream(args).skip(1).forEach(sb::append);
+            Arrays.stream(args).skip(1).forEach(str -> {
+                sb.append(str);
+                sb.append("\n");
+            });
             String src = sb.toString();
             PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), src);
             return true;

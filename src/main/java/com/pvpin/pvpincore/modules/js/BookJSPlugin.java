@@ -22,7 +22,11 @@
  */
 package com.pvpin.pvpincore.modules.js;
 
+import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.PVPINCore;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.meta.BookMeta;
+import org.graalvm.polyglot.Source;
 
 import java.util.UUID;
 
@@ -32,16 +36,33 @@ import java.util.UUID;
 public class BookJSPlugin extends StringJSPlugin {
     private BookMeta meta;
 
-    public BookJSPlugin(UUID player, BookMeta src) {
-        super(player, getContents(src));
-        this.meta = src;
+    public BookJSPlugin(UUID player, BookMeta meta) {
+        super();
+        this.player = player;
+        this.meta = meta;
+        this.src = "function main(){\n" + getContents(meta) + "}\n";
+        String name = Bukkit.getOfflinePlayer(player).getName() + "_" + (meta.hasTitle() ? meta.getTitle() : UUID.randomUUID().toString());
+        String version = "0.0.1";
+        String author = Bukkit.getOfflinePlayer(player).getName();
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        context.getBindings("js").putMember("name", name);
+        context.getBindings("js").putMember("version", version);
+        context.getBindings("js").putMember("author", author);
+        context.getPolyglotBindings().putMember("name", getName());
+        context.getPolyglotBindings().putMember("version", getVersion());
+        context.getPolyglotBindings().putMember("author", getAuthor());
+
+        context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+        this.logger = PVPINLogManager.getLogger(this.getName());
+        Thread.currentThread().setContextClassLoader(appCl);
     }
 
     private static String getContents(BookMeta meta) {
         StringBuilder sb = new StringBuilder();
         meta.getPages().forEach(sb::append);
-        String str =  sb.toString();
-        if(str.isBlank()||str.isEmpty()){
+        String str = sb.toString();
+        if (str.isBlank() || str.isEmpty()) {
             throw new RuntimeException("Invalid JavaScript Code.");
         }
         return str;

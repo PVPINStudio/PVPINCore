@@ -28,9 +28,11 @@ import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.graalvm.polyglot.Context;
@@ -115,10 +117,10 @@ public class JSPluginAccessController {
         if (cxt.getPolyglotBindings().getMember("name") != null) {
             PVPINLoggerFactory.getCoreLogger().error("来源:" + cxt.getPolyglotBindings().getMember("name"));
             AbstractJSPlugin plugin = PVPINCore.getScriptManagerInstance().getPluginByName(cxt.getPolyglotBindings().getMember("name").asString());
-            if(plugin instanceof LocalFileJSPlugin){
-                PVPINLoggerFactory.getCoreLogger().error("源文件:" + ((LocalFileJSPlugin)plugin).getSourceFile().getName());
-            }else if(plugin instanceof StringJSPlugin){
-                PVPINLoggerFactory.getCoreLogger().error("执行插件的玩家:" + Bukkit.getOfflinePlayer(((StringJSPlugin)plugin).getPlayer()).getName());
+            if (plugin instanceof LocalFileJSPlugin) {
+                PVPINLoggerFactory.getCoreLogger().error("源文件:" + ((LocalFileJSPlugin) plugin).getSourceFile().getName());
+            } else if (plugin instanceof StringJSPlugin) {
+                PVPINLoggerFactory.getCoreLogger().error("执行插件的玩家:" + Bukkit.getOfflinePlayer(((StringJSPlugin) plugin).getPlayer()).getName());
             }
         }
         cxt.getPolyglotBindings().putMember("close", true);
@@ -148,8 +150,17 @@ public class JSPluginAccessController {
 
 class ReloadListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onReload(ServerCommandEvent event) {
+    public void onReload_Console(ServerCommandEvent event) {
         if (event.getCommand().startsWith("reload") || event.getCommand().startsWith("rl")) {
+            PVPINLoggerFactory.getCoreLogger().error("PVPINCore 不支持重载, 请重启服务器");
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onReload_Player(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().startsWith("/reload") || event.getMessage().startsWith("/rl")) {
+            event.getPlayer().sendMessage(ChatColor.RED + "PVPINCore 不支持重载, 请重启服务器");
             PVPINLoggerFactory.getCoreLogger().error("PVPINCore 不支持重载, 请重启服务器");
             event.setCancelled(true);
         }

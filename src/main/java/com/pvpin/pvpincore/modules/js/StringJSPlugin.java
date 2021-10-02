@@ -33,20 +33,21 @@ import org.bukkit.entity.Player;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * @author William_Shi
  */
 public class StringJSPlugin extends AbstractJSPlugin {
-    private UUID player;
-    private String src;
+    protected UUID player;
+    protected String src;
 
     public StringJSPlugin(UUID player, String src) {
         super();
         this.player = player;
-        this.src = src;
-        String name = Bukkit.getOfflinePlayer(player).getName() + UUID.randomUUID();
+        this.src = "function main(){\n" + src + "}\n";
+        String name = Bukkit.getOfflinePlayer(player).getName() + "_" + UUID.randomUUID();
         String version = "0.0.1";
         String author = Bukkit.getOfflinePlayer(player).getName();
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
@@ -58,9 +59,13 @@ public class StringJSPlugin extends AbstractJSPlugin {
         context.getPolyglotBindings().putMember("version", getVersion());
         context.getPolyglotBindings().putMember("author", getAuthor());
 
-        context.eval(Source.newBuilder("js", src, name).buildLiteral());
+        context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
         this.logger = PVPINLogManager.getLogger(this.getName());
         Thread.currentThread().setContextClassLoader(appCl);
+    }
+
+    protected StringJSPlugin() {
+        super();
     }
 
     @Override
@@ -89,17 +94,20 @@ public class StringJSPlugin extends AbstractJSPlugin {
         if (context.getPolyglotBindings().hasMember("close")) {
             return false;
         }
-        if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
-            JSPluginAccessController.denyAccess(context);
+        if (!Bukkit.getOfflinePlayer(player).isOnline()) {
             return false;
         }
-        if (!context.getPolyglotBindings().getMember("version").asString().equals(context.getBindings("js").getMember("version").asString())) {
-            JSPluginAccessController.denyAccess(context);
-            return false;
-        }
-        if (!context.getPolyglotBindings().getMember("author").asString().equals(context.getBindings("js").getMember("author").asString())) {
-            JSPluginAccessController.denyAccess(context);
-            return false;
+        List<String> list = List.of("name", "version", "author");
+        for (String action : list) {
+            if (!context.getPolyglotBindings().hasMember(action)) {
+                JSPluginAccessController.denyAccess(context);
+                return false;
+            }
+            if (!context.getPolyglotBindings().getMember(action).asString()
+                    .equals(context.getBindings("js").getMember(action).asString())) {
+                JSPluginAccessController.denyAccess(context);
+                return false;
+            }
         }
         return true;
     }
@@ -117,6 +125,8 @@ public class StringJSPlugin extends AbstractJSPlugin {
         sb.append(getVersion());
         sb.append(" Author(s):");
         sb.append(getAuthor());
+        sb.append(" Executor:");
+        sb.append(Bukkit.getOfflinePlayer(player).getName());
         return sb.toString();
     }
 

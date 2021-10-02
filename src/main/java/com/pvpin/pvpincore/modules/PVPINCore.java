@@ -59,12 +59,15 @@ public class PVPINCore extends JavaPlugin {
         Bukkit.getPluginCommand("pvpincore").setExecutor(mainCmd);
         Bukkit.getPluginCommand("pvpincore").setTabCompleter(mainCmd);
         // Register command /pvpincore.
+        PVPINLoggerFactory.getCoreLogger().info("指令注册完毕");
 
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
         // Ignore the warning that the polyglot context is using an implementation
         // that does not support runtime compilation.
 
+        PVPINLoggerFactory.getCoreLogger().info("开始加载全部 JavaScript 插件");
         scriptManagerInstance.onEnable();
+        PVPINLoggerFactory.getCoreLogger().info("全部 JavaScript 插件加载完毕");
         PVPINLoggerFactory.getCoreLogger().info("PVPIN OK.");
         // Salute PVPIN !
         // This is the output of PVPIN JavaScript Runtime since 2017.
@@ -73,7 +76,10 @@ public class PVPINCore extends JavaPlugin {
     @Override
     public void onDisable() {
         scriptManagerInstance.onDisable();
+        PVPINLoggerFactory.getCoreLogger().info("全部 JavaScript 插件卸载完毕");
+
         PersistenceManager.saveAll();
+        PVPINLoggerFactory.getCoreLogger().info("全部插件数据保存完毕");
     }
 
     public static Plugin getCoreInstance() {

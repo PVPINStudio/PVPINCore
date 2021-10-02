@@ -172,6 +172,13 @@ public class PVPINLoggerFactory {
         return logger;
     }
 
+    /**
+     * This method is used to replace the System.out stream for an appender with FileDescriptor.out<p>
+     * Because the standard output in a spigot based server begins with [HH:mm:ss]:<p>
+     * Using this method can print a line directly to the screen and bypass the spigot limits.
+     *
+     * @param appender the appender to be hacked
+     */
     private static void hackConsoleAppender(ConsoleAppender appender) {
         try {
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");

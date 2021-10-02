@@ -39,8 +39,19 @@ public class BootStrap {
     public static void boot() throws Exception {
         PVPINLoggerFactory.loadLoggers();
         // Logging is initialized first.
+        PVPINLoggerFactory.getCoreLogger().info("日志系统初始化完毕");
+
         LibraryLoader.loadLibraries();
         // Download libraries.
+        PVPINLoggerFactory.getCoreLogger().info("依赖加载完毕");
+
+        PVPINCore.getCoreInstance().saveResource("pvpin.policy", true);
+        System.setProperty("java.security.policy", new File(PVPINCore.getCoreInstance().getDataFolder(), "pvpin.policy").toURI().toURL().toString());
+        Policy.getPolicy().refresh();
+        System.setSecurityManager(new JSSecurityManager());
+        // Replace the old security manager.
+        PVPINLoggerFactory.getCoreLogger().info("安全管理系统加载完毕");
+
         Class.forName(VersionChecker.class.getName());
         // VersionChecker is used in many NMS related classes.
         // So load it before any NMSUtils subclass is loaded.
@@ -57,10 +68,6 @@ public class BootStrap {
                         }
                     });
         }
-        PVPINCore.getCoreInstance().saveResource("pvpin.policy", true);
-        System.setProperty("java.security.policy", new File(PVPINCore.getCoreInstance().getDataFolder(), "pvpin.policy").toURI().toURL().toString());
-        Policy.getPolicy().refresh();
-        System.setSecurityManager(new JSSecurityManager());
-        // Replace the old security manager.
+        PVPINLoggerFactory.getCoreLogger().info("各启动时运行模块加载完毕");
     }
 }

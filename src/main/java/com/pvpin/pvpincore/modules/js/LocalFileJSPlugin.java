@@ -59,10 +59,10 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
     @Override
     public void enable() {
         try {
-            if(!context.getBindings("js").hasMember("main")){
+            if (!context.getBindings("js").hasMember("main")) {
                 throw new RuntimeException();
             }
-            if(!context.getBindings("js").getMember("main").canExecute()){
+            if (!context.getBindings("js").getMember("main").canExecute()) {
                 throw new RuntimeException();
             }
             Value func = context.getBindings("js").getMember("main");
@@ -85,17 +85,17 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
         if (context.getPolyglotBindings().hasMember("close")) {
             return false;
         }
-        if (!context.getPolyglotBindings().getMember("name").asString().equals(context.getBindings("js").getMember("name").asString())) {
-            JSPluginAccessController.denyAccess(context);
-            return false;
-        }
-        if (!context.getPolyglotBindings().getMember("version").asString().equals(context.getBindings("js").getMember("version").asString())) {
-            JSPluginAccessController.denyAccess(context);
-            return false;
-        }
-        if (!context.getPolyglotBindings().getMember("author").asString().equals(context.getBindings("js").getMember("author").asString())) {
-            JSPluginAccessController.denyAccess(context);
-            return false;
+        List<String> list = List.of("name", "version", "author");
+        for (String action : list) {
+            if (!context.getPolyglotBindings().hasMember(action)) {
+                JSPluginAccessController.denyAccess(context);
+                return false;
+            }
+            if (!context.getPolyglotBindings().getMember(action).asString()
+                    .equals(context.getBindings("js").getMember(action).asString())) {
+                JSPluginAccessController.denyAccess(context);
+                return false;
+            }
         }
         return true;
     }
