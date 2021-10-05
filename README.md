@@ -1,74 +1,57 @@
-## PVPINCore Introduction
+# PVPINCore Introduction
 
 ---
 
-PVPINCore 是由 PVPINStudio 团队成员 `William_Shi`、 `Rain_Effect`、`MiaoWoo`、`Eustia_Saint` 共同开发的 Bukkit 插件。
+PVPINCore 是由 PVPIN Studio 团队成员 `William_Shi`、 `Rain_Effect`、`MiaoWoo`、`Eustia_Saint` 共同开发的 Bukkit 插件。
 
-感谢 `ThatRarityEG` 在开发时提供的帮助。
+感谢 `ThatRarityEG` 在开发时提供的无私帮助。
 
-本插件提供了 JavaScript 代码的加载功能，并能加载用户编写的 JavaScript 插件。
+本插件提供了 JavaScript 代码的加载功能，并能基于本地文件加载编写的 JavaScript 插件。同时允许玩家在游戏内直接执行一段 JavaScript 代码。（此功能慎用！慎用！慎用！）
 
-本插件提供了一系列 API 以供 JavaScript 调用，包括对于事件监听、指令、任务调度器、持久化等功能的简单封装。
+本插件主要使用 Java 编写而成。同时提供一系列 API 以供 JavaScript 调用，包括对于事件监听、指令、任务调度器、持久化等功能的简单封装。禁止了 JavaScript 所有 I/O 操作。包括 NodeJS 和 通过 `java.io` 等多种读写文件的方法都无效。
 
-本插件主要使用 Java 编写而成，但同时提供了一系列供 JavaScript 调用的方法。
+本插件使用 GraalJS v21.2.0 加载 JavaScript 代码。
 
-本插件使用 GraalJS v21.2.0 并以此加载 JavaScript 代码。
 
-PVPINCore is a Bukkit Plugin developed by `William_Shi`, `Rain_Effect`, `MiaoWoo` and `Eustia_Saint` from PVPINStudio.
+
+PVPINCore is a Bukkit Plugin developed by `William_Shi`, `Rain_Effect`, `MiaoWoo` and `Eustia_Saint` from PVPIN Studio.
 
 A special thanks goes to `ThatRarityEG` in acknowledgement of her kind help. 
 
-This plugin can be used to load custom JavaScript plugins written by users.
+This plugin can be used to load custom JavaScript plugins in local `.js` files. Players may also execute their own JavaScript code using commands in game. CAUTION! You NEVER know what malicious function calls may a player write!  Bear the consequences YOURSELF!
 
-Though written in Java, this plugin provides a series of APIs easy for JavaScript to use.
+Though written in Java, this plugin provides a series of APIs designed for JavaScript to use. These include simple wrappers for event listeners, command executors, task schedulers and persistence holders. All I/O access is denied, including multiple ways to read or write files such as NodeJS I/Os or `java.io` methods.
 
 This plugin uses GraalJS 21.2.0 to load JavaScript code.
+
+
+
+## Installation
+
+向服务器内安装 PVPINCore 插件，详见 [INSTALLATION.md](INSTALLATION.md) 。
+
+
+
+If you want to install our PVPINCore plugin on your server, you may go to [INSTALLATION.md](INSTALLATION.md) for details.
+
+
 
 ## Usage
 
 ---
 
-将插件置于服务端内 `plugins` 文件夹中，并开启服务器，稍后将会生成 `plugins/PVPINCore/js` 文件夹。
+PVPINCore 插件提供的全部指令的使用方法，详见 [USAGE.md](USAGE.md) 。
 
-将已经编写好的 JavaScript 插件移动到该文件夹中，重启服务器即自动加载。
 
-同时也可以通过指令加载、卸载插件。处于安全考虑，目前仅允许服务器后台通过指令控制文件内插件的加载、卸载。
 
-`/pvpincore js reload` -- 重载所有文件夹内 JavaScript 插件并卸载其他临时插件
+If you want to know the usage of all the commands provided by our PVPINCore plugin, you may go to [USAGE.md](USAGE.md) for details.
 
-`/pvpincore js enable <文件名>` -- 加载 `/js` 文件夹内指定 `.js` 文件
 
-`/pvpincore js disable <插件名>` -- 卸载已经加载的指定插件
 
-指令均提供补全功能，会自动检测 `/js` 文件夹并提供文件名补全，但请勿采用文件软连接等方式向文件夹内添加文件，这样的文件无法被正常读取。
+## APIDOCS
 
-指令也可用于临时运行一段 JavaScript 语句。
+基于 PVPINCore 所提供的 API 开发 JavaScript 插件或 Java 插件的指导，详见 [APIDOCS.md](APIDOCS.md) 。
 
-`/pvpincore eval <JavaScript>` -- 执行一段JavaScript语句
 
-`/pvpincore eval` -- 读取手持成书中内容并作为一段JavaScript语句加载
 
-Download the plugin jar and put it into the `plugins` folder, and start the server.
-
-`plugins/PVPINCore/js` folder will be automatically generated in a while.
-
-Then you may add custom JavaScript plugins into the folder and restart your server.
-
-All `.js` files in that folder are loaded on start, and you may also enable/disable plugins manually using commands.
-
-`/pvpincore js reload` -- Reload all JavaScript plugins
-
-`/pvpincore js enable <File Name>` -- load a `.js` file by name
-
-`/pvpincore js disable <Plugin Name>` -- unload a JavaScript plugin by name
-
-Due to safety concerns, all `pvpincore js` commands are currently only entitled to the console. NO player is allowed to
-execute them.
-
-All the commands provide tab completes, so you won't need to check the file name / plugin name by yourself.
-
-You may also temporarily load some JavaScript code using the following command:
-
-`/pvpincore eval <JavaScript>` -- Directly execute some JavaScript code.
-
-`/pvpincore eval` -- Reads the contents of the written book in the command sender's hand, and execute the string content as a piece of JavaScript code. 
+If you want to know how to use the APIs provided by our PVPINCore plugin to develop a JavaScript or Java plugin that depends on PVPINCore by yourself, you may go to [APIDOCS.md](APIDOCS.md) for details.
