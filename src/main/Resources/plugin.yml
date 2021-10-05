@@ -24,7 +24,7 @@
 ## YAML Template.
 ---
 name: PVPINCore
-version: 1.1.1
+version: 1.1.2
 main: com.pvpin.pvpincore.modules.PVPINCore
 authors:
   - William_Shi

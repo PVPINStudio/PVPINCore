@@ -22,63 +22,77 @@
  */
 package com.pvpin.pvpincore.modules.jsloader.command;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.PVPINScriptManager;
+import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.command.ConsoleCommandSender;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
  * @author William_Shi
  */
-public class SubCmdJSEval {
+public class SubCmdDisable {
     protected static void sendHelp(CommandSender sender) {
-        sender.sendMessage("========PVPINCore-EVAL指令========");
-        sender.sendMessage("/pvpincore eval <JavaScript> -- 执行一段JavaScript语句");
-        sender.sendMessage("/pvpincore eval -- 读取手持成书中全部内容并执行");
+        sender.sendMessage("========PVPINCore-DISABLE指令========");
+        sender.sendMessage("/pvpincore disable <插件名> -- 卸载指定名称的JavaScript插件");
         sender.sendMessage("================================");
     }
 
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供玩家使用。");
-            sendHelp(sender);
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供后台使用。");
             return true;
         }
         if (args.length == 1) {
-            ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();
-            if (stack == null) {
+            sendHelp(sender);
+            return true;
+        }
+        switch (args[0].toLowerCase()) {
+            case "disable": {
+                if (args.length != 2) {
+                    sendHelp(sender);
+                    return true;
+                }
+                PVPINCore.getScriptManagerInstance().disablePlugin(
+                        args[1]
+                );
+                return true;
+            }
+            default: {
                 sendHelp(sender);
                 return true;
             }
-            if ((stack.getType() != XMaterial.WRITTEN_BOOK.parseMaterial()) && (stack.getType() != XMaterial.WRITABLE_BOOK.parseMaterial())) {
-                sendHelp(sender);
-                return true;
-            }
-            BookMeta meta = (BookMeta) stack.getItemMeta();
-            PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), meta);
-            return true;
-        } else {
-            StringBuilder sb = new StringBuilder();
-            Arrays.stream(args).skip(1).forEach(str -> {
-                sb.append(str);
-                sb.append("\n");
-            });
-            String src = sb.toString();
-            PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), src);
-            return true;
         }
     }
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
-        return List.of();
+        List<String> second = List.of("disable");
+        if (args.length == 1) {
+            return second.stream().filter(
+                    action -> action.startsWith(args[0].toLowerCase())
+            ).collect(Collectors.toList());
+        }
+        switch (args[0].toLowerCase()) {
+            case "disable": {
+                List<String> result = new ArrayList();
+                PVPINCore.getScriptManagerInstance().getAllPlugins().forEach(action -> {
+                    result.add(((AbstractJSPlugin) action).getName());
+                });
+                return result.stream().filter(
+                        action -> action.toLowerCase().startsWith(args[1].toLowerCase())
+                ).collect(Collectors.toList());
+            }
+            default: {
+                return List.of();
+            }
+        }
     }
 }

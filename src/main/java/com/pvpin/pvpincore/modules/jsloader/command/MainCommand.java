@@ -42,20 +42,30 @@ public class MainCommand implements TabExecutor {
             return true;
         }
         switch (args[0].toLowerCase()) {
+            case "disable": {
+                return SubCmdDisable.onCommand(sender, command, s, args);
+            }
             case "eval": {
                 return SubCmdJSEval.onCommand(sender, command, s, args);
             }
-            case "js": {
-                return SubCmdJSFile.onCommand(sender, command, s, args);
+            case "loadfile": {
+                return SubCmdJSLoadFile.onCommand(sender, command, s, args);
+            }
+            case "reset":
+            case "resetall": {
+                return SubCmdJSReset.onCommand(sender, command, s, args);
+            }
+            case "help":
+            default: {
+                return SubCmdHelp.onCommand(sender, command, s, args);
             }
         }
-        return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
         if (args.length == 0 || args.length == 1) {
-            List<String> first = List.of("eval", "js");
+            List<String> first = List.of("disable", "help", "eval", "loadfile", "reset", "resetall");
             // The first arg
             if (args.length == 0) {
                 return first;
@@ -66,13 +76,23 @@ public class MainCommand implements TabExecutor {
             }
         }
         switch (args[0].toLowerCase()) {
+            case "disable": {
+                return SubCmdDisable.onTabComplete(sender, command, s, args);
+            }
             case "eval": {
                 return SubCmdJSEval.onTabComplete(sender, command, s, args);
             }
-            case "js": {
-                return SubCmdJSFile.onTabComplete(sender, command, s, args);
+            case "loadfile": {
+                return SubCmdJSLoadFile.onTabComplete(sender, command, s, args);
+            }
+            case "reset":
+            case "resetall": {
+                return SubCmdJSReset.onTabComplete(sender, command, s, args);
+            }
+            case "help":
+            default: {
+                return SubCmdHelp.onTabComplete(sender, command, s, args);
             }
         }
-        return null;
     }
 }

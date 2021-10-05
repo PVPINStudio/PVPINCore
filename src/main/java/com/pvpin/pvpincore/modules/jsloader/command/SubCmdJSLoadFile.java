@@ -37,12 +37,10 @@ import java.util.stream.Collectors;
 /**
  * @author William_Shi
  */
-public class SubCmdJSFile {
+public class SubCmdJSLoadFile {
     protected static void sendHelp(CommandSender sender) {
-        sender.sendMessage("========PVPINCore-JS指令========");
-        sender.sendMessage("/pvpincore js reload -- 重载所有JavaScript插件");
-        sender.sendMessage("/pvpincore js enable <文件名> -- 加载指定.js文件");
-        sender.sendMessage("/pvpincore js disable <插件名> -- 卸载指定插件");
+        sender.sendMessage("========PVPINCore-LOADFILE指令========");
+        sender.sendMessage("/pvpincore loadfile <文件名> -- 加载指定.js文件");
         sender.sendMessage("================================");
     }
 
@@ -55,36 +53,18 @@ public class SubCmdJSFile {
             sendHelp(sender);
             return true;
         }
-        switch (args[1].toLowerCase()) {
-            case "rl":
-                // Command aliases.
-            case "reload": {
+        switch (args[0].toLowerCase()) {
+            case "loadfile": {
                 if (args.length != 2) {
-                    sendHelp(sender);
-                    return true;
-                }
-                PVPINCore.getScriptManagerInstance().onReload();
-                return true;
-            }
-            case "enable": {
-                if (args.length != 3) {
                     sendHelp(sender);
                     return true;
                 }
                 PVPINCore.getScriptManagerInstance().enablePlugin(
                         new File(
                                 new File(PVPINCore.getCoreInstance().getDataFolder(), "js"),
-                                args[2]
+                                args[1]
                         )
                 );
-                return true;
-            }
-            case "disable": {
-                if (args.length != 3) {
-                    sendHelp(sender);
-                    return true;
-                }
-                PVPINCore.getScriptManagerInstance().disablePlugin(args[2]);
                 return true;
             }
             default: {
@@ -95,14 +75,14 @@ public class SubCmdJSFile {
     }
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
-        List<String> second = List.of("reload", "enable", "disable");
-        if (args.length == 2) {
+        List<String> second = List.of("loadfile");
+        if (args.length == 1) {
             return second.stream().filter(
-                    action -> action.startsWith(args[1].toLowerCase())
+                    action -> action.startsWith(args[0].toLowerCase())
             ).collect(Collectors.toList());
         }
-        switch (args[1]) {
-            case "enable": {
+        switch (args[0].toLowerCase()) {
+            case "loadfile": {
                 List<String> result = new ArrayList();
                 Arrays.stream(Objects.requireNonNull(
                         new File(PVPINCore.getCoreInstance().getDataFolder(), "js")
@@ -111,16 +91,7 @@ public class SubCmdJSFile {
                     result.add(file.getName());
                 });
                 return result.stream().filter(
-                        action -> action.toLowerCase().startsWith(args[2].toLowerCase())
-                ).collect(Collectors.toList());
-            }
-            case "disable": {
-                List<String> result = new ArrayList();
-                PVPINCore.getScriptManagerInstance().getAllPlugins().forEach(action -> {
-                    result.add(((AbstractJSPlugin) action).getName());
-                });
-                return result.stream().filter(
-                        action -> action.toLowerCase().startsWith(args[2].toLowerCase())
+                        action -> action.toLowerCase().startsWith(args[1].toLowerCase())
                 ).collect(Collectors.toList());
             }
             default: {

@@ -122,6 +122,12 @@ public class PVPINScriptManager {
         if (!MAP.containsKey(pluginName)) {
             throw new RuntimeException("No such plugin: " + pluginName);
         }
+        AbstractJSPlugin plugin = MAP.get(pluginName);
+        if (plugin instanceof LocalFileJSPlugin) {
+            PVPINLoggerFactory.getCoreLogger().info("卸载 " + plugin.getName() + " 版本" + plugin.getVersion() + " 源文件" + ((LocalFileJSPlugin) plugin).getSourceFile());
+        } else if (plugin instanceof StringJSPlugin) {
+            PVPINLoggerFactory.getCoreLogger().warn("卸载 " + plugin.getName() + " 版本" + plugin.getVersion() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(((StringJSPlugin) plugin).getPlayer()).getName());
+        }
         MAP.get(pluginName).disable();
         MAP.remove(pluginName);
     }
@@ -260,8 +266,8 @@ public class PVPINScriptManager {
      *
      * @return all JavaScript plugins loaded
      */
-    public List getAllPlugins() {
-        return Arrays.asList(MAP.values().toArray());
+    public Collection<AbstractJSPlugin> getAllPlugins() {
+        return MAP.values();
     }
 
     /**
