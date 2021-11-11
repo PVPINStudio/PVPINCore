@@ -23,8 +23,7 @@
 package com.pvpin.pvpincore.impl.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
-import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;

@@ -20,9 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.security;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.Context;
 
 import java.io.FileDescriptor;

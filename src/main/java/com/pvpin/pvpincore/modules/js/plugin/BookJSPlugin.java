@@ -20,14 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.plugin;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.js.parser.LoopParser;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.meta.BookMeta;
 import org.graalvm.polyglot.Source;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -35,12 +37,42 @@ import java.util.UUID;
  */
 public class BookJSPlugin extends StringJSPlugin {
     private BookMeta meta;
+    private String src;
 
+    public BookJSPlugin(UUID player, String src) {
+        super();
+        this.player = player;
+        this.meta = meta;
+        this.src = src;
+        String name = Bukkit.getOfflinePlayer(player).getName() + "_" + (meta.hasTitle() ? meta.getTitle() : UUID.randomUUID().toString());
+        String version = "0.0.1";
+        String author = Bukkit.getOfflinePlayer(player).getName();
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        try {
+            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
+        } catch (IOException ex) {
+            PVPINLogManager.log(ex);
+        }
+        context.getBindings("js").putMember("name", name);
+        context.getBindings("js").putMember("version", version);
+        context.getBindings("js").putMember("author", author);
+        context.getPolyglotBindings().putMember("name", getName());
+        context.getPolyglotBindings().putMember("version", getVersion());
+        context.getPolyglotBindings().putMember("author", getAuthor());
+
+        context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+
+        this.logger = PVPINLogManager.getLogger(this.getName());
+        Thread.currentThread().setContextClassLoader(appCl);
+    }
+
+    @Deprecated
     public BookJSPlugin(UUID player, BookMeta meta) {
         super();
         this.player = player;
         this.meta = meta;
-        this.src = "function main(){\n" + getContents(meta) + "}\n";
+        this.src = new LoopParser("function main(){\n" + getContents(meta) + "}\n").parse();
         String name = Bukkit.getOfflinePlayer(player).getName() + "_" + (meta.hasTitle() ? meta.getTitle() : UUID.randomUUID().toString());
         String version = "0.0.1";
         String author = Bukkit.getOfflinePlayer(player).getName();
@@ -53,12 +85,17 @@ public class BookJSPlugin extends StringJSPlugin {
         context.getPolyglotBindings().putMember("version", getVersion());
         context.getPolyglotBindings().putMember("author", getAuthor());
 
-        context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+        try {
+            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
+            context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+        } catch (IOException ex) {
+            PVPINLogManager.log(ex);
+        }
         this.logger = PVPINLogManager.getLogger(this.getName());
         Thread.currentThread().setContextClassLoader(appCl);
     }
 
-    private static String getContents(BookMeta meta) {
+    public static String getContents(BookMeta meta) {
         StringBuilder sb = new StringBuilder();
         meta.getPages().forEach(sb::append);
         String str = sb.toString();

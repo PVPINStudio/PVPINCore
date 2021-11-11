@@ -1,5 +1,14 @@
 var scriptManager = Java.type("com.pvpin.pvpincore.modules.PVPINCore").getScriptManagerInstance();
 
+const eval = (() => {
+    const oldEval = globalThis.eval;
+    return (code) => {
+        var ParserManager = Java.type("com.pvpin.pvpincore.modules.js.parser.ParserManager");
+        var newCode = ParserManager.parse(code);
+        oldEval(newCode);
+    }
+})();
+
 function log(msg) {
     scriptManager.log(msg);
 }

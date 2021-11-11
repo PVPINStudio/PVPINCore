@@ -23,8 +23,7 @@
 package com.pvpin.pvpincore.impl.listener;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
-import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;

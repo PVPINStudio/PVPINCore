@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.plugin;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.impl.command.CommandManager;
@@ -28,29 +28,80 @@ import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.js.parser.InfoParser;
+import com.pvpin.pvpincore.modules.js.parser.LoopParser;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.*;
-import org.slf4j.Logger;
 
 import java.io.*;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * @author William_Shi
  */
 public class LocalFileJSPlugin extends AbstractJSPlugin {
-    private File file;
+    protected File file;
+    protected String src;
 
+    public LocalFileJSPlugin(File file, String src) {
+        super();
+        try {
+            ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+            // Replace the AppClassLoader
+            this.file = file;
+            this.src = src;
+            InfoParser parser = new InfoParser(src);
+            try {
+                context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
+            } catch (IOException ex) {
+                PVPINLogManager.log(ex);
+            }
+            context.getBindings("js").putMember("name", parser.parseName());
+            context.getBindings("js").putMember("version", parser.parseVersion());
+            context.getBindings("js").putMember("author", parser.parseAuthor());
+            context.getPolyglotBindings().putMember("name", parser.parseName());
+            context.getPolyglotBindings().putMember("version", parser.parseVersion());
+            context.getPolyglotBindings().putMember("author", parser.parseAuthor());
+
+            context.eval(Source.newBuilder("js", this.src, "🐎").buildLiteral());
+
+            this.logger = PVPINLogManager.getLogger(this.getName());
+            this.logger.info(getName() + " has been loaded.");
+            Thread.currentThread().setContextClassLoader(appCl);
+        } catch (Exception ex) {
+            PVPINLogManager.log(ex);
+        }
+    }
+
+    @Deprecated
     public LocalFileJSPlugin(File file) {
         super();
         try {
+            ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+            // Replace the AppClassLoader
             this.file = file;
-            context.eval(Source.newBuilder(Source.findLanguage(file), file).build());
+            this.src = new LoopParser(
+                    Source.newBuilder(Source.findLanguage(file), file).build().getCharacters().toString()
+            ).parse();
+            // System.out.println(this.src);
+            InfoParser parser = new InfoParser(src);
+            context.getBindings("js").putMember("name", parser.parseName());
+            context.getBindings("js").putMember("version", parser.parseVersion());
+            context.getBindings("js").putMember("author", parser.parseAuthor());
+            context.getPolyglotBindings().putMember("name", parser.parseName());
+            context.getPolyglotBindings().putMember("version", parser.parseVersion());
+            context.getPolyglotBindings().putMember("author", parser.parseAuthor());
+            try {
+                context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
+                context.eval(Source.newBuilder("js", this.src, "🐎").buildLiteral());
+            } catch (IOException ex) {
+                PVPINLogManager.log(ex);
+            }
             this.logger = PVPINLogManager.getLogger(this.getName());
-            context.getPolyglotBindings().putMember("name", getName());
-            context.getPolyglotBindings().putMember("version", getVersion());
-            context.getPolyglotBindings().putMember("author", getAuthor());
             this.logger.info(getName() + " has been loaded.");
+            Thread.currentThread().setContextClassLoader(appCl);
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }

@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.plugin;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.impl.command.CommandManager;
@@ -28,11 +28,13 @@ import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,12 +48,17 @@ public class StringJSPlugin extends AbstractJSPlugin {
     public StringJSPlugin(UUID player, String src) {
         super();
         this.player = player;
-        this.src = "function main(){\n" + src + "}\n";
+        this.src = src;
         String name = Bukkit.getOfflinePlayer(player).getName() + "_" + UUID.randomUUID();
         String version = "0.0.1";
         String author = Bukkit.getOfflinePlayer(player).getName();
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        try {
+            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
+        } catch (IOException ex) {
+            PVPINLogManager.log(ex);
+        }
         context.getBindings("js").putMember("name", name);
         context.getBindings("js").putMember("version", version);
         context.getBindings("js").putMember("author", author);
@@ -60,6 +67,7 @@ public class StringJSPlugin extends AbstractJSPlugin {
         context.getPolyglotBindings().putMember("author", getAuthor());
 
         context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+
         this.logger = PVPINLogManager.getLogger(this.getName());
         Thread.currentThread().setContextClassLoader(appCl);
     }

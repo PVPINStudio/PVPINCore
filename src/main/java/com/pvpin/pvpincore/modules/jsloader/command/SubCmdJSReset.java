@@ -23,7 +23,7 @@
 package com.pvpin.pvpincore.modules.jsloader.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.StringJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.StringJSPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -31,7 +31,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.stream.Collectors;

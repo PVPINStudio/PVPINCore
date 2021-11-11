@@ -22,8 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.scheduler;
 
-import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
-import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.graalvm.polyglot.Value;
 

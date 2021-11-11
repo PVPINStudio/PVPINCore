@@ -20,10 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.security;
 
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.LocalFileJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.StringJSPlugin;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
@@ -113,6 +116,11 @@ public class JSPluginAccessController {
      * @param cxt current context
      */
     public static void denyAccess(Context cxt) {
+        if(cxt.getPolyglotBindings().hasMember("internal")){
+            return;
+            // Contexts used internally can bypass any restriction.
+            // Currently, only contexts from js parsers (to call JSHINT or to parse expressions) have that member.
+        }
         PVPINLoggerFactory.getCoreLogger().error("已阻止未授权的 JavaScript 操作");
         if (cxt.getPolyglotBindings().getMember("name") != null) {
             PVPINLoggerFactory.getCoreLogger().error("来源:" + cxt.getPolyglotBindings().getMember("name"));

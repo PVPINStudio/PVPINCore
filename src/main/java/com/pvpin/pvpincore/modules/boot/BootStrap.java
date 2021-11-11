@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.modules.boot;
 
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.JSSecurityManager;
+import com.pvpin.pvpincore.modules.js.security.JSSecurityManager;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;

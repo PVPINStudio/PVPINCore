@@ -23,8 +23,7 @@
 package com.pvpin.pvpincore.modules.jsloader.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
-import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -59,12 +58,14 @@ public class SubCmdJSLoadFile {
                     sendHelp(sender);
                     return true;
                 }
-                PVPINCore.getScriptManagerInstance().enablePlugin(
-                        new File(
-                                new File(PVPINCore.getCoreInstance().getDataFolder(), "js"),
-                                args[1]
-                        )
-                );
+                Bukkit.getScheduler().runTaskAsynchronously(PVPINCore.getCoreInstance(), () -> {
+                    PVPINCore.getScriptManagerInstance().enablePlugin(
+                            new File(
+                                    new File(PVPINCore.getCoreInstance().getDataFolder(), "js"),
+                                    args[1]
+                            )
+                    );
+                });
                 return true;
             }
             default: {

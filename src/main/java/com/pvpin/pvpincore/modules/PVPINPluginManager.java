@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.api.PVPINListener;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;

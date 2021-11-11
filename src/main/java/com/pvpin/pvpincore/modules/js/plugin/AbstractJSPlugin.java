@@ -20,14 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.js;
+package com.pvpin.pvpincore.modules.js.plugin;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.*;
 import org.slf4j.Logger;
 
-import java.io.IOException;
+import java.io.BufferedOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,12 +59,10 @@ public abstract class AbstractJSPlugin {
                 .allowNativeAccess(true)
                 .allowHostClassLoading(true)
                 .allowHostClassLookup(JSPluginAccessController::checkJSLookUpHostClass)
+                .out(new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out))))
+                .allowExperimentalOptions(true)
+                .option("js.scripting", "true")
                 .build();
-        try {
-            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
-        } catch (IOException ex) {
-            PVPINLogManager.log(ex);
-        }
         Thread.currentThread().setContextClassLoader(appCl);
     }
 

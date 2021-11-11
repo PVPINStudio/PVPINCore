@@ -25,6 +25,7 @@ package com.pvpin.pvpincore.modules.jsloader.command;
 import com.cryptomorin.xseries.XMaterial;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.PVPINScriptManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -64,7 +65,9 @@ public class SubCmdJSEval {
                 return true;
             }
             BookMeta meta = (BookMeta) stack.getItemMeta();
-            PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), meta);
+            Bukkit.getScheduler().runTaskAsynchronously(PVPINCore.getCoreInstance(), () -> {
+                PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), meta);
+            });
             return true;
         } else {
             StringBuilder sb = new StringBuilder();
@@ -73,7 +76,9 @@ public class SubCmdJSEval {
                 sb.append("\n");
             });
             String src = sb.toString();
-            PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), src);
+            Bukkit.getScheduler().runTaskAsynchronously(PVPINCore.getCoreInstance(), () -> {
+                PVPINCore.getScriptManagerInstance().enablePlugin(((Player) sender).getUniqueId(), src);
+            });
             return true;
         }
     }

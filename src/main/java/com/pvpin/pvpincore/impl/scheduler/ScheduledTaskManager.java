@@ -23,7 +23,7 @@
 package com.pvpin.pvpincore.impl.scheduler;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.Context;
 
 import java.util.ArrayList;

@@ -67,7 +67,6 @@ public class PVPINCore extends JavaPlugin {
 
         PVPINLoggerFactory.getCoreLogger().info("开始加载全部 JavaScript 插件");
         scriptManagerInstance.onEnable();
-        PVPINLoggerFactory.getCoreLogger().info("全部 JavaScript 插件加载完毕");
         PVPINLoggerFactory.getCoreLogger().info("PVPIN OK.");
         // Salute PVPIN !
         // This is the output of PVPIN JavaScript Runtime since 2017.

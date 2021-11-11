@@ -24,8 +24,7 @@ package com.pvpin.pvpincore.impl.scheduler;
 
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.AbstractJSPlugin;
-import com.pvpin.pvpincore.modules.js.LocalFileJSPlugin;
+import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.graalvm.polyglot.Value;
 
 /**

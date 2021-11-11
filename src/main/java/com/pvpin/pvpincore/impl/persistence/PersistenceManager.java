@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.impl.persistence;
 
 import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.JSPluginAccessController;
+import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Context;
 
