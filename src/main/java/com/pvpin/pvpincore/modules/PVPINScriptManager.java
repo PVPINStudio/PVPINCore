@@ -246,7 +246,7 @@ public class PVPINScriptManager {
         try {
             String src0 = ParserManager.parse("function main(){\n" + BookJSPlugin.getContents(src) + "}\n");
             Bukkit.getScheduler().runTask(PVPINCore.getCoreInstance(), () -> {
-                BookJSPlugin plugin = new BookJSPlugin(player, src0);
+                BookJSPlugin plugin = new BookJSPlugin(player, src, src0);
                 PVPINLoggerFactory.getCoreLogger().info("正在加载JavaScriptPlugin: " + plugin.getName() + " 执行插件的玩家" + Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
                 if (MAP.containsKey(plugin.getName())) {
                     AbstractJSPlugin old = MAP.get(plugin.getName());

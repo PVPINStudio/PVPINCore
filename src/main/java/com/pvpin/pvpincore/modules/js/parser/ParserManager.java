@@ -38,25 +38,20 @@ import java.io.IOException;
 @PVPINLoadOnEnable
 public class ParserManager {
 
-    protected static final Context CXT;
-
-    static {
+    public static String parse(String code) {
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-        CXT = Context.newBuilder("js").allowAllAccess(true).build();
-        CXT.getPolyglotBindings().putMember("internal", true);
-        try {
-            CXT.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/espree.js")).build());
-            CXT.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/parser.js")).build());
+        String result = null;
+        try (Context cxt = Context.newBuilder("js").allowAllAccess(true).build()) {
+            cxt.getPolyglotBindings().putMember("internal", true);
+            cxt.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/espree.js")).build());
+            cxt.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/parser.js")).build());
+            cxt.getBindings("js").putMember("pvpin_src0", code);
+            result = cxt.eval("js", "parse(pvpin_src0)").asString();
         } catch (IOException ex) {
             PVPINLogManager.log(ex);
         }
         Thread.currentThread().setContextClassLoader(appCl);
-    }
-
-    public static String parse(String code) {
-        CXT.getBindings("js").putMember("pvpin_src0", code);
-        String result = CXT.eval("js", "parse(pvpin_src0)").asString();
         return result;
     }
 

@@ -25,9 +25,12 @@ package com.pvpin.pvpincore.modules.js.parser;
 import com.oracle.js.parser.*;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.VarNode;
+import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
+import org.graalvm.polyglot.Context;
 
-import static com.pvpin.pvpincore.modules.js.parser.ParserManager.CXT;
+import java.io.IOException;
 
 /**
  * @author William_Shi
@@ -46,27 +49,33 @@ public class InfoParser {
         Source src = Source.sourceFor("js", code);
         Parser parser = new Parser(ScriptEnvironment.builder().build(), src, new ErrorManager.ThrowErrorManager());
         this.node = parser.parse();
-        node.getBody().getStatements().forEach(element -> {
-            if (element.isTokenType(TokenType.VAR) || element.isTokenType(TokenType.LET) || element.isTokenType(TokenType.CONST)) {
-                VarNode varNode = (VarNode) element;
-                if (varNode.isAssignment()) {
-                    switch (varNode.getName().getName()) {
-                        case "name": {
-                            this.name = CXT.eval("js", varNode.getAssignmentSource().toString()).asString();
-                            break;
-                        }
-                        case "version": {
-                            this.version = CXT.eval("js", varNode.getAssignmentSource().toString()).asString();
-                            break;
-                        }
-                        case "author": {
-                            this.author = CXT.eval("js", varNode.getAssignmentSource().toString()).asString();
-                            break;
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        try (Context cxt = Context.newBuilder("js").allowAllAccess(true).build()) {
+            cxt.getPolyglotBindings().putMember("internal", true);
+            node.getBody().getStatements().forEach(element -> {
+                if (element.isTokenType(TokenType.VAR) || element.isTokenType(TokenType.LET) || element.isTokenType(TokenType.CONST)) {
+                    VarNode varNode = (VarNode) element;
+                    if (varNode.isAssignment()) {
+                        switch (varNode.getName().getName()) {
+                            case "name": {
+                                this.name = cxt.eval("js", varNode.getAssignmentSource().toString()).asString();
+                                break;
+                            }
+                            case "version": {
+                                this.version = cxt.eval("js", varNode.getAssignmentSource().toString()).asString();
+                                break;
+                            }
+                            case "author": {
+                                this.author = cxt.eval("js", varNode.getAssignmentSource().toString()).asString();
+                                break;
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+        Thread.currentThread().setContextClassLoader(appCl);
         parseName();
         parseVersion();
         parseAuthor();

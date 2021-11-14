@@ -39,12 +39,15 @@ public class BookJSPlugin extends StringJSPlugin {
     private BookMeta meta;
     private String src;
 
-    public BookJSPlugin(UUID player, String src) {
+    public BookJSPlugin(UUID player, BookMeta meta, String src) {
         super();
         this.player = player;
         this.meta = meta;
         this.src = src;
         String name = Bukkit.getOfflinePlayer(player).getName() + "_" + (meta.hasTitle() ? meta.getTitle() : UUID.randomUUID().toString());
+        if (PVPINCore.getScriptManagerInstance().getPluginByName(name) == null) {
+            name = Bukkit.getOfflinePlayer(player).getName() + "_" + UUID.randomUUID().toString();
+        }
         String version = "0.0.1";
         String author = Bukkit.getOfflinePlayer(player).getName();
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
