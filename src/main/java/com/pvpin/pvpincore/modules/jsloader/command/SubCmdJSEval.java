@@ -73,7 +73,7 @@ public class SubCmdJSEval {
             StringBuilder sb = new StringBuilder();
             Arrays.stream(args).skip(1).forEach(str -> {
                 sb.append(str);
-                sb.append("\n");
+                sb.append(" ");
             });
             String src = sb.toString();
             Bukkit.getScheduler().runTaskAsynchronously(PVPINCore.getCoreInstance(), () -> {
