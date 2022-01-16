@@ -20,7 +20,6 @@ public class Main extends JavaPlugin {
         try {
             PVPINCore.getPluginManagerInstance().registerAll();
             Class.forName(CommandDemo.class.getName());
-            Class.forName(TranslationDemo.class.getName());
             Class.forName(PersistenceDemo.class.getName());
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
