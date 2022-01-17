@@ -28,11 +28,11 @@ This plugin uses GraalJS 21.2.0 to load JavaScript code.
 
 ## Installation
 
-向服务器内安装 PVPINCore 插件，详见 [INSTALLATION.md](INSTALLATION.md) 。
+向服务器内安装 PVPINCore 插件，详见 [INSTALLATION.md](docs/INSTALLATION.md) 。
 
 
 
-If you want to install our PVPINCore plugin on your server, you may go to [INSTALLATION.md](INSTALLATION.md) for details.
+If you want to install our PVPINCore plugin on your server, you may go to [INSTALLATION.md](docs/INSTALLATION.md) for details.
 
 
 
@@ -40,18 +40,19 @@ If you want to install our PVPINCore plugin on your server, you may go to [INSTA
 
 ---
 
-PVPINCore 插件提供的全部指令的使用方法，详见 [USAGE.md](USAGE.md) 。
+PVPINCore 插件提供的全部指令的使用方法，详见 [USAGE.md](docs/USAGE.md) 。
 
 
 
-If you want to know the usage of all the commands provided by our PVPINCore plugin, you may go to [USAGE.md](USAGE.md) for details.
+If you want to know the usage of all the commands provided by our PVPINCore plugin, you may go to [USAGE.md](docs/USAGE.md) for details.
 
 
 
 ## APIDOCS
 
-基于 PVPINCore 所提供的 API 开发 JavaScript 插件或 Java 插件的指导，详见 [APIDOCS.md](APIDOCS.md) 。
+基于 PVPINCore 所提供的 API 开发 JavaScript 插件或 Java 插件的指导，详见 [APIDOCS.md](docs/APIDOCS.md) 。
 
 
 
-If you want to know how to use the APIs provided by our PVPINCore plugin to develop a JavaScript or Java plugin that depends on PVPINCore by yourself, you may go to [APIDOCS.md](APIDOCS.md) for details.
+If you want to know how to use the APIs provided by our PVPINCore plugin to develop a JavaScript or Java plugin that depends on PVPINCore by yourself, you may go to [APIDOCS.md](docs/APIDOCS.md) for details.
+
