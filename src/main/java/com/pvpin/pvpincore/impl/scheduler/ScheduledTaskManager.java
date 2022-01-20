@@ -23,6 +23,8 @@
 package com.pvpin.pvpincore.impl.scheduler;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.config.ConfigManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.Context;
 
@@ -36,7 +38,7 @@ import java.util.List;
  * @author William_Shi
  */
 public class ScheduledTaskManager {
-    protected static final List<JSScheduledTask> TASKS = new ArrayList<>(64);
+    protected static final List<JSScheduledTask> TASKS = new ArrayList<>(ConfigManager.PLUGIN_SCHEDULER_CAPACITY);
 
     /**
      * This method is used to get a builder for JSScheduledTasks.
@@ -46,7 +48,7 @@ public class ScheduledTaskManager {
      */
     public static TaskBuilder newTaskBuilder() {
         if (!JSPluginAccessController.isLoadedByJavaScriptEngine()) {
-            throw new RuntimeException();
+            throw new RuntimeException(I18N.translateByDefault("scheduler.access"));
         }
         Context context = Context.getCurrent();
         String pluginName = context.getPolyglotBindings().getMember("name").asString();
@@ -55,7 +57,7 @@ public class ScheduledTaskManager {
     }
 
     public static void cancelTasks(String pluginName) {
-        List<JSScheduledTask> temp = new ArrayList(16);
+        List<JSScheduledTask> temp = new ArrayList<>(16);
         TASKS.forEach(action -> {
             if (action.plugin.getName().equals(pluginName)) {
                 temp.add(action);

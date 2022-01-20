@@ -25,6 +25,7 @@ package com.pvpin.pvpincore.modules;
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.modules.boot.BootStrap;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.jsloader.command.MainCommand;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.bukkit.Bukkit;
@@ -59,15 +60,15 @@ public class PVPINCore extends JavaPlugin {
         Bukkit.getPluginCommand("pvpincore").setExecutor(mainCmd);
         Bukkit.getPluginCommand("pvpincore").setTabCompleter(mainCmd);
         // Register command /pvpincore.
-        PVPINLoggerFactory.getCoreLogger().info("指令注册完毕");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.cmd"));
 
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
         // Ignore the warning that the polyglot context is using an implementation
         // that does not support runtime compilation.
 
-        PVPINLoggerFactory.getCoreLogger().info("开始加载全部 JavaScript 插件");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.js"));
         scriptManagerInstance.onEnable();
-        PVPINLoggerFactory.getCoreLogger().info("PVPIN OK.");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.ok"));
         // Salute PVPIN !
         // This is the output of PVPIN JavaScript Runtime since 2017.
     }

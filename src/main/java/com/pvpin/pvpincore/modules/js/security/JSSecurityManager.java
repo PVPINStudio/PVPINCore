@@ -22,8 +22,7 @@
  */
 package com.pvpin.pvpincore.modules.js.security;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
-import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import org.graalvm.polyglot.Context;
 
 import java.io.FileDescriptor;

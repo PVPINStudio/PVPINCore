@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.modules.js.plugin;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.js.parser.LoopParser;
 import org.bukkit.Bukkit;
@@ -103,7 +104,7 @@ public class BookJSPlugin extends StringJSPlugin {
         meta.getPages().forEach(sb::append);
         String str = sb.toString();
         if (str.isBlank() || str.isEmpty()) {
-            throw new RuntimeException("Invalid JavaScript Code.");
+            throw new RuntimeException(I18N.translateByDefault("js.parser.blank"));
         }
         return str;
     }

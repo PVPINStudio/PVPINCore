@@ -25,6 +25,8 @@ package com.pvpin.pvpincore.modules.jsloader.command;
 import com.cryptomorin.xseries.XMaterial;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.PVPINScriptManager;
+import com.pvpin.pvpincore.modules.config.ConfigManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -42,17 +44,20 @@ import java.util.stream.Collectors;
  */
 public class SubCmdJSEval {
     protected static void sendHelp(CommandSender sender) {
-        sender.sendMessage("========PVPINCore-EVAL指令========");
-        sender.sendMessage("/pvpincore eval <JavaScript> -- 执行一段JavaScript语句");
-        sender.sendMessage("/pvpincore eval -- 读取手持成书中全部内容并执行");
+        sender.sendMessage("========PVPINCore-EVAL========");
+        sender.sendMessage(I18N.translate(((Player) sender).getLocale(), "cmd.eval.1"));
+        sender.sendMessage(I18N.translate(((Player) sender).getLocale(), "cmd.eval.2"));
         sender.sendMessage("================================");
     }
 
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供玩家使用。");
+            sender.sendMessage(ChatColor.RED + I18N.translate(((Player) sender).getLocale(), "cmd.deny.pl"));
             sendHelp(sender);
             return true;
+        }
+        if (!ConfigManager.TRUSTED_PLAYERS.contains(((Player) sender).getUniqueId())) {
+            return false;
         }
         if (args.length == 1) {
             ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();

@@ -81,11 +81,7 @@ public class VersionChecker {
         Integer vCurr = Integer.parseInt(currBuilder.toString());
         Integer vCompare = Integer.parseInt(builder.toString());
         // A number such as 1121 (v1_12_R1).
-        if (vCurr >= vCompare) {
-            return true;
-        } else {
-            return false;
-        }
+        return vCurr >= vCompare;
     }
 
 }

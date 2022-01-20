@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.nms.entity;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import org.bukkit.entity.Player;
@@ -80,7 +80,7 @@ public class PlayerNMSUtils extends EntityNMSUtils {
             Object nmsPlayerObj = getNMSEntity(player);
             Object nmsPlayerConnObj = nmsPlayer.getField("playerConnection").get(nmsPlayerObj);
 
-            Constructor textCons = nmsChatComponentText.getConstructor(String.class);
+            Constructor<?> textCons = nmsChatComponentText.getConstructor(String.class);
             Object text = textCons.newInstance(msg);
             Object type = Arrays.stream((Enum[]) nmsChatMessageType.getEnumConstants()).filter(action ->
                     action.name().equals("GAME_INFO")).collect(Collectors.toList()).get(0);
@@ -88,13 +88,13 @@ public class PlayerNMSUtils extends EntityNMSUtils {
 
             Object packet = null;
             if (VersionChecker.isCurrentHigherOrEquals("v1_16_R0")) {
-                Constructor cons = nmsPacketPlayOutChat.getConstructor(
+                Constructor<?> cons = nmsPacketPlayOutChat.getConstructor(
                         nmsIChatBaseComponent, nmsChatMessageType, UUID.class
                 );
                 packet = cons.newInstance(text, type, uid);
                 // Constructor is changed in 1.16.
             } else {
-                Constructor cons = nmsPacketPlayOutChat.getConstructor(
+                Constructor<?> cons = nmsPacketPlayOutChat.getConstructor(
                         nmsIChatBaseComponent, nmsChatMessageType
                 );
                 packet = cons.newInstance(text, type);

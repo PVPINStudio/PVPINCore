@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.impl.persistence;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.api.PVPINPersistence;
 
 import java.util.Map;
@@ -55,7 +56,7 @@ class JavaPersistenceHolder extends AbstractHolder {
         // com.pvpin.pvpincore.api.PVPINPersistence.getDataMap
         if (!elements[2].getClassName().equals("com.pvpin.pvpincore.api.PVPINPersistence")) {
             try {
-                throw new IllegalAccessException();
+                throw new IllegalAccessException(I18N.translateByDefault("persistence.access.java"));
             } catch (Exception ex) {
                 PVPINLogManager.log(ex);
             }

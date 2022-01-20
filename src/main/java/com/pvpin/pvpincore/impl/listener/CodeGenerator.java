@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.listener;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 

@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.nms.block;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.VersionChecker;

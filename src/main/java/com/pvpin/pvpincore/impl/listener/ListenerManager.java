@@ -24,7 +24,8 @@ package com.pvpin.pvpincore.impl.listener;
 
 import com.pvpin.pvpincore.api.PVPINListener;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.config.ConfigManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,17 +57,17 @@ import org.graalvm.polyglot.Value;
 @PVPINLoadOnEnable
 public class ListenerManager {
 
-    protected static final Map<Class<?>, List> LOWEST = new HashMap<>(64);
+    protected static final Map<Class<?>, List> LOWEST = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_LOWEST);
     // LOWEST Priority Listeners
-    protected static final Map<Class<?>, List> LOW = new HashMap<>(32);
+    protected static final Map<Class<?>, List> LOW = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_LOW);
     // LOW Priority Listeners
-    protected static final Map<Class<?>, List> NORMAL = new HashMap<>(256);
+    protected static final Map<Class<?>, List> NORMAL = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_NORMAL);
     // NORMAL Priority Listeners
-    protected static final Map<Class<?>, List> HIGH = new HashMap<>(32);
+    protected static final Map<Class<?>, List> HIGH = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_HIGH);
     // HIGH Priority Listeners
-    protected static final Map<Class<?>, List> HIGHEST = new HashMap<>(32);
+    protected static final Map<Class<?>, List> HIGHEST = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_HIGHEST);
     // HIGHEST Priority Listeners
-    protected static final Map<Class<?>, List> MONITOR = new HashMap<>(64);
+    protected static final Map<Class<?>, List> MONITOR = new HashMap<>(ConfigManager.PLUGIN_LISTENER_CAPACITY_MONITOR);
     // MONITOR Priority Listeners
 
     private static final ListenerImpl LISTENER = new ListenerImpl();
@@ -227,16 +228,15 @@ public class ListenerManager {
      * @param pluginName name of the plugin
      */
     public static void unregisterListener(String pluginName) {
-        List<Map<Class<?>, List>> maps = List.of(LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR);
+        List<Map<Class<?>, List<JSListener>>> maps = (List<Map<Class<?>, List<JSListener>>>) (Object) List.of(LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR);
         maps.forEach(map -> {
             map.forEach((clazz, list) -> {
-                List temp = new ArrayList();
+                List<JSListener> temp = new ArrayList<>(16);
                 // Stores all the elements to be deleted.
                 list.forEach(listener -> {
-                    JSListener lis = (JSListener) listener;
-                    lis.plugin.isValid();
-                    if (lis.callback.getContext().getPolyglotBindings().getMember("name").asString().equals(pluginName)) {
-                        temp.add(lis);
+                    listener.plugin.isValid();
+                    if (listener.callback.getContext().getPolyglotBindings().getMember("name").asString().equals(pluginName)) {
+                        temp.add(listener);
                     }
                 });
                 if (!temp.isEmpty()) {

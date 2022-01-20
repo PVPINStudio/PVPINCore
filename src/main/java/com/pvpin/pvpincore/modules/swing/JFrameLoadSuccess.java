@@ -23,12 +23,9 @@
 package com.pvpin.pvpincore.modules.swing;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.IOException;
 import java.net.URI;
 import javax.imageio.ImageIO;

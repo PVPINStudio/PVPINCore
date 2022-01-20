@@ -24,7 +24,8 @@ package com.pvpin.pvpincore.impl.command;
 
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.config.ConfigManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -32,8 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.bukkit.Bukkit.getServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -65,7 +64,7 @@ public class CommandManager {
         }
     }
 
-    protected static final List<JSCommand> JAVASCRIPT_CMDS = new ArrayList(32);
+    protected static final List<JSCommand> JAVASCRIPT_CMDS = new ArrayList(ConfigManager.PLUGIN_COMMAND_CAPACITY);
 
     /**
      * This method is used to register a new command.<p>
@@ -85,7 +84,7 @@ public class CommandManager {
             pluginCmd = constructor.newInstance(cmd, plugin);
             Field cmdMapField = SimplePluginManager.class.getDeclaredField("commandMap");
             cmdMapField.setAccessible(true);
-            CommandMap map = (CommandMap) cmdMapField.get(getServer().getPluginManager());
+            CommandMap map = (CommandMap) cmdMapField.get(Bukkit.getServer().getPluginManager());
             map.register(cmd, pluginCmd);
         } catch (InstantiationException
                 | IllegalAccessException
@@ -119,7 +118,7 @@ public class CommandManager {
             // So plugins can be registered using PVPINCore instance.
             Field cmdMapField = SimplePluginManager.class.getDeclaredField("commandMap");
             cmdMapField.setAccessible(true);
-            CommandMap map = (CommandMap) cmdMapField.get(getServer().getPluginManager());
+            CommandMap map = (CommandMap) cmdMapField.get(Bukkit.getServer().getPluginManager());
             map.register(cmd, pluginCmd);
         } catch (InstantiationException
                 | IllegalAccessException
@@ -158,11 +157,11 @@ public class CommandManager {
         try {
             Field cmdMapField = SimplePluginManager.class.getDeclaredField("commandMap");
             cmdMapField.setAccessible(true);
-            CommandMap map = (CommandMap) cmdMapField.get(getServer().getPluginManager());
+            CommandMap map = (CommandMap) cmdMapField.get(Bukkit.getServer().getPluginManager());
             Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
             knownCommandsField.setAccessible(true);
             Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(map);
-            List<String> temp = new ArrayList<>(10);
+            List<String> temp = new ArrayList<>(16);
             knownCommands.forEach((key, value) -> {
                 if (value.getName().equalsIgnoreCase(cmd)
                         || value.getAliases().stream().anyMatch(action -> action.equalsIgnoreCase(cmd))) {
@@ -183,7 +182,7 @@ public class CommandManager {
      * @param pluginName the name of the plugin
      */
     public static void unregisterJavaScriptCmds(String pluginName) {
-        List<JSCommand> temp = new ArrayList(10);
+        List<JSCommand> temp = new ArrayList(16);
         JAVASCRIPT_CMDS.forEach(action -> {
             if (action.plugin.getName().equals(pluginName)) {
                 unregisterJavaScriptCmd(action.cmdName);

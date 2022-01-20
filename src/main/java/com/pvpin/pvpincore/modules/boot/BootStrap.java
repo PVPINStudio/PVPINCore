@@ -24,6 +24,7 @@ package com.pvpin.pvpincore.modules.boot;
 
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.security.JSSecurityManager;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
@@ -43,11 +44,11 @@ public class BootStrap {
     public static void boot() throws Exception {
         PVPINLoggerFactory.loadLoggers();
         // Logging is initialized first.
-        PVPINLoggerFactory.getCoreLogger().info("日志系统初始化完毕");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.log"));
 
         LibraryLoader.loadLibraries();
         // Download libraries.
-        PVPINLoggerFactory.getCoreLogger().info("依赖加载完毕");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.dependency"));
 
         PVPINCore.getCoreInstance().saveResource("com/pvpin/pvpincore/modules/js/security/pvpin.policy", true);
         File policyFileOrigin = new File(PVPINCore.getCoreInstance().getDataFolder(), "com/pvpin/pvpincore/modules/js/security/pvpin.policy");
@@ -83,7 +84,7 @@ public class BootStrap {
         Policy.getPolicy().refresh();
         System.setSecurityManager(new JSSecurityManager());
         // Replace the old security manager.
-        PVPINLoggerFactory.getCoreLogger().info("安全管理系统加载完毕");
+        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.security"));
 
         Class.forName(VersionChecker.class.getName());
         // VersionChecker is used in many NMS related classes.
@@ -101,6 +102,5 @@ public class BootStrap {
                         }
                     });
         }
-        PVPINLoggerFactory.getCoreLogger().info("各启动时运行模块加载完毕");
     }
 }

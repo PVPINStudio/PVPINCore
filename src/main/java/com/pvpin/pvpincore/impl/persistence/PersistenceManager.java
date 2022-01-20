@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.impl.persistence;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -67,7 +68,7 @@ public class PersistenceManager {
             } else {
                 StackTraceElement[] elements = Thread.currentThread().getStackTrace();
                 if (!elements[2].getClassName().startsWith("com.pvpin")) {
-                    throw new IllegalAccessException();
+                    throw new IllegalAccessException(I18N.translateByDefault("persistence.access.java"));
                 }
                 // 0 java.base/java.lang.Thread.getStackTrace,
                 // 1 com.pvpin.pvpincore.impl.persistence.PersistenceManager,

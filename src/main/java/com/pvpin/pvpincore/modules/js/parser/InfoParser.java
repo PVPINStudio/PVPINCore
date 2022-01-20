@@ -25,12 +25,10 @@ package com.pvpin.pvpincore.modules.js.parser;
 import com.oracle.js.parser.*;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.VarNode;
-import com.pvpin.pvpincore.api.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import org.graalvm.polyglot.Context;
-
-import java.io.IOException;
 
 /**
  * @author William_Shi
@@ -85,20 +83,20 @@ public class InfoParser {
         if (name != null) {
             return name;
         }
-        throw new RuntimeException();
+        throw new RuntimeException(I18N.translateByDefault("js.parser.name"));
     }
 
     public String parseVersion() {
         if (version != null) {
             return version;
         }
-        throw new RuntimeException();
+        throw new RuntimeException(I18N.translateByDefault("js.parser.version"));
     }
 
     public String parseAuthor() {
         if (author != null) {
             return author;
         }
-        throw new RuntimeException();
+        throw new RuntimeException(I18N.translateByDefault("js.parser.author"));
     }
 }

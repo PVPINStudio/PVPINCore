@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.nms.itemstack;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
@@ -133,7 +133,7 @@ public class ItemStackNMSUtils extends NMSUtils {
                     return nmsItemStack_getTag.invoke(nmsItem);
                     // Get if there is a compound.
                 } else {
-                    Constructor con = NMSUtils.nmsNBTTagCompound.getConstructor();
+                    Constructor<?> con = NMSUtils.nmsNBTTagCompound.getConstructor();
                     return con.newInstance();
                     // Create one.
                 }

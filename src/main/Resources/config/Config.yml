@@ -21,15 +21,21 @@
 # THE SOFTWARE.
 #
 
-## YAML Template.
----
-name: PVPINCore
-version: 1.2.0
-main: com.pvpin.pvpincore.modules.PVPINCore
-authors:
-  - William_Shi
-  - MiaoWoo
-  - Rain_Effect
-  - Eustia_Saint
+defaultLocale: "zh_CN"
+## zh_CN, zh_TW, en_US
 
-api-version: 1.13
+pluginCapacity: 5
+## Number of JavaScript plugins to be loaded
+## Better larger than smaller!
+pluginCommandCapacity: 10
+## Number of commands to be registered by all JavaScript plugins
+pluginListenerCapacity_Lowest: 5
+pluginListenerCapacity_Low: 5
+pluginListenerCapacity_Normal: 25
+pluginListenerCapacity_High: 5
+pluginListenerCapacity_Highest: 5
+pluginListenerCapacity_Monitor: 5
+## Number of listeners to be registered by all JavaScript plugins
+## Usually, normal priority listeners are used the most frequently
+pluginSchedulerCapacity: 25
+## Number of schedulers to be registered by all JavaScript plugins

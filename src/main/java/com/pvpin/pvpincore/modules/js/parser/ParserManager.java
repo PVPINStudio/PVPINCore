@@ -25,7 +25,7 @@ package com.pvpin.pvpincore.modules.js.parser;
 import com.oracle.js.parser.*;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.VarNode;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import org.graalvm.polyglot.Context;

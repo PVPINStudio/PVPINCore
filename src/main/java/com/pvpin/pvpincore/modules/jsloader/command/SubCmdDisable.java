@@ -23,6 +23,7 @@
 package com.pvpin.pvpincore.modules.jsloader.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -38,14 +39,14 @@ import java.util.stream.Collectors;
  */
 public class SubCmdDisable {
     protected static void sendHelp(CommandSender sender) {
-        sender.sendMessage("========PVPINCore-DISABLE指令========");
-        sender.sendMessage("/pvpincore disable <插件名> -- 卸载指定名称的JavaScript插件");
+        sender.sendMessage("========PVPINCore-DISABLE========");
+        sender.sendMessage(I18N.translateByDefault("cmd.disable"));
         sender.sendMessage("================================");
     }
 
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!(sender instanceof ConsoleCommandSender)) {
-            sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供后台使用。");
+            sender.sendMessage(ChatColor.RED + I18N.translateByDefault("cmd.deny"));
             return true;
         }
         if (args.length == 1) {

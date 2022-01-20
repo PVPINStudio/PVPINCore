@@ -24,7 +24,7 @@ package com.pvpin.pvpincore.impl.nms.nbt;
 
 import com.pvpin.pvpincore.impl.nms.NMSUtils;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 
 import static com.pvpin.pvpincore.impl.nms.VersionChecker.version;
 
@@ -66,7 +66,7 @@ public class NBTIO extends NMSUtils {
         try {
             if (!file.exists()) {
                 file.createNewFile();
-                // 保证文件存在
+                // Make sure the file exists.
             }
             if (compound == null) {
                 nmsNBTCompressedStreamTools_write.invoke(null, nmsNBTTagCompound.getConstructor().newInstance(), new FileOutputStream(file));
@@ -95,7 +95,7 @@ public class NBTIO extends NMSUtils {
         try {
             if (!file.exists()) {
                 file.createNewFile();
-                // 保证文件存在
+                // Make sure the file exists.
                 try {
                     return nmsNBTTagCompound.newInstance();
                 } catch (Exception ex) {

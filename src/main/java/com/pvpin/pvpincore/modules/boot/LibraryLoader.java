@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.modules.boot;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -78,7 +79,7 @@ public class LibraryLoader {
             session.setLocalRepositoryManager(repository.newLocalRepositoryManager((RepositorySystemSession) session, new LocalRepository("plugins/PVPINCore/libraries")));
             session.setTransferListener((TransferListener) new AbstractTransferListener() {
                 public void transferStarted(TransferEvent event) throws TransferCancelledException {
-                    PVPINLoggerFactory.getCoreLogger().info("正在从MavenCentral下载依赖" + event.getResource().getResourceName());
+                    PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.dependency.downloading"), event.getResource().getResourceName());
                 }
             });
             session.setReadOnly();

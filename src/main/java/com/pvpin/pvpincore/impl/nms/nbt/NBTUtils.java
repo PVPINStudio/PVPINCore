@@ -23,7 +23,8 @@
 package com.pvpin.pvpincore.impl.nms.nbt;
 
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
 
 import java.io.*;
@@ -250,7 +251,7 @@ public class NBTUtils extends NBTIO {
                 } else if (nmsNBTNumber.isAssignableFrom(base.getClass())) {
                     result.put(key, base.getClass().getMethod("asDouble").invoke(base));
                 } else {
-                    throw new RuntimeException("Data type not supported.");
+                    throw new RuntimeException(I18N.translateByDefault("nbt.datatype"));
                 }
             }
         } catch (InvocationTargetException
@@ -343,7 +344,7 @@ public class NBTUtils extends NBTIO {
                 } else if (nmsNBTNumber.isAssignableFrom(action.getClass())) {
                     result.add(action.getClass().getMethod("asDouble").invoke(action));
                 } else {
-                    throw new RuntimeException("Data type not supported.");
+                    throw new RuntimeException(I18N.translateByDefault("nbt.datatype"));
                 }
             } catch (InvocationTargetException
                     | IllegalAccessException
@@ -408,7 +409,7 @@ public class NBTUtils extends NBTIO {
                         cons.setAccessible(true);
                         nmsNBTTagCompound_set.invoke(finalResult, key, cons.newInstance(((Number) value).doubleValue()));
                     } else {
-                        throw new RuntimeException("Data type not supported.");
+                        throw new RuntimeException(I18N.translateByDefault("nbt.datatype"));
                     }
                 } catch (InvocationTargetException
                         | IllegalAccessException
@@ -485,7 +486,7 @@ public class NBTUtils extends NBTIO {
                     cons.setAccessible(true);
                     nmsNBTTagList_add.invoke(result, cons.newInstance(((Number) action).doubleValue()));
                 } else {
-                    throw new RuntimeException("Data type not supported.");
+                    throw new RuntimeException(I18N.translateByDefault("nbt.datatype"));
                 }
             }
         } catch (InstantiationException

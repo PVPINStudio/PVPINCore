@@ -24,6 +24,7 @@ package com.pvpin.pvpincore.impl.scheduler;
 
 
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.graalvm.polyglot.Value;
 
@@ -91,10 +92,10 @@ public class TaskBuilder {
      */
     public JSScheduledTask buildAndRun() {
         if (callback == null) {
-            throw new RuntimeException();
+            throw new RuntimeException(I18N.translateByDefault("scheduler.callback"));
         }
         if (!callback.canExecute()) {
-            throw new RuntimeException();
+            throw new RuntimeException(I18N.translateByDefault("scheduler.callback"));
         }
         JSScheduledTask task = new JSScheduledTask(plugin, callback);
         ScheduledTaskManager.TASKS.add(task);

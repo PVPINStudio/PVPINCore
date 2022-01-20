@@ -20,43 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.pvpin.pvpincore.modules.swing;
+package com.pvpin.pvpincore.modules.i18n;
 
-import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
-
-import javax.swing.*;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import java.awt.*;
+import com.pvpin.pvpincore.modules.config.ConfigManager;
 
 /**
  * @author William_Shi
  */
-public class JFrameManager {
+public class I18N {
 
-    /**
-     * Display a window
-     */
-    public static void startShow() {
-        if (!Desktop.isDesktopSupported()) {
-            return;
-            // Do nothing
+    public static String translateByDefault(String key) {
+        return translate(ConfigManager.DEFAULT_LOCALE, key);
+    }
+
+    public static String translate(String locale, String key) {
+        StringBuilder formatted = new StringBuilder();
+        if (locale.contains("_")) {
+            formatted.append(locale.split("_")[0].toLowerCase());
+            formatted.append("_");
+            formatted.append(locale.split("_")[1].toUpperCase());
+        } else if (locale.length() == 4) {
+            formatted.append(locale.substring(0, 2).toLowerCase());
+            formatted.append("_");
+            formatted.append(locale.substring(2).toUpperCase());
+        } else {
+            throw new RuntimeException();
         }
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(NimbusLookAndFeel.class.getName());
-                // Location of Windows look and feel is changed in JDK9
-                // So we use Nimbus look and feel
-            } catch (ClassNotFoundException
-                    | InstantiationException
-                    | IllegalAccessException
-                    | UnsupportedLookAndFeelException ex) {
-                PVPINLogManager.log(ex);
-            }
-            JFrame successFrame = new JFrameLoadSuccess();
-            successFrame.setLocationByPlatform(true);
-            successFrame.setVisible(true);
-            SwingUtilities.updateComponentTreeUI(successFrame);
-        });
+        return LangManager.LANG_MAP.containsKey(formatted.toString()) ?
+                LangManager.LANG_MAP.get(formatted.toString()).get(key) :
+                LangManager.LANG_MAP.get(ConfigManager.DEFAULT_LOCALE).get(key);
     }
 
 }

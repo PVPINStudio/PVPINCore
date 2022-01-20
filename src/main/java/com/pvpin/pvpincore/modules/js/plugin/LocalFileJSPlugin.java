@@ -22,7 +22,8 @@
  */
 package com.pvpin.pvpincore.modules.js.plugin;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
 import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
@@ -111,10 +112,10 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
     public void enable() {
         try {
             if (!context.getBindings("js").hasMember("main")) {
-                throw new RuntimeException();
+                throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
             }
             if (!context.getBindings("js").getMember("main").canExecute()) {
-                throw new RuntimeException();
+                throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
             }
             Value func = context.getBindings("js").getMember("main");
             func.executeVoid();

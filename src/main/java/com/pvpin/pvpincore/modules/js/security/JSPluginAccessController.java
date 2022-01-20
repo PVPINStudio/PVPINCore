@@ -24,6 +24,7 @@ package com.pvpin.pvpincore.modules.js.security;
 
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import com.pvpin.pvpincore.modules.js.plugin.LocalFileJSPlugin;
 import com.pvpin.pvpincore.modules.js.plugin.StringJSPlugin;
@@ -132,7 +133,7 @@ public class JSPluginAccessController {
             }
         }
         cxt.getPolyglotBindings().putMember("close", true);
-        throw new RuntimeException("Access Denied.");
+        throw new RuntimeException(I18N.translateByDefault("js.access"));
     }
 
     /**

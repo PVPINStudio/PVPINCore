@@ -23,6 +23,7 @@
 package com.pvpin.pvpincore.modules.jsloader.command;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -38,14 +39,14 @@ import java.util.stream.Collectors;
  */
 public class SubCmdJSLoadFile {
     protected static void sendHelp(CommandSender sender) {
-        sender.sendMessage("========PVPINCore-LOADFILE指令========");
-        sender.sendMessage("/pvpincore loadfile <文件名> -- 加载指定.js文件");
+        sender.sendMessage("========PVPINCore-LOADFILE========");
+        sender.sendMessage(I18N.translateByDefault("cmd.load"));
         sender.sendMessage("================================");
     }
 
     public static boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!(sender instanceof ConsoleCommandSender)) {
-            sender.sendMessage(ChatColor.RED + "抱歉，该指令暂时仅供后台使用。");
+            sender.sendMessage(ChatColor.RED + I18N.translateByDefault("cmd.deny"));
             return true;
         }
         if (args.length == 1) {

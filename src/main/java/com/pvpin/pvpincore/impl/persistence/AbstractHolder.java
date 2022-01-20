@@ -22,7 +22,7 @@
  */
 package com.pvpin.pvpincore.impl.persistence;
 
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.nms.nbt.NBTIO;
 import com.pvpin.pvpincore.impl.nms.nbt.NBTUtils;
 import com.pvpin.pvpincore.modules.PVPINCore;

@@ -6,9 +6,8 @@
 package com.pvpin.pvpincore.demo;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.api.PVPINLogManager;
+import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.graalvm.polyglot.Context;
 
 /**
  * @author William_Shi
