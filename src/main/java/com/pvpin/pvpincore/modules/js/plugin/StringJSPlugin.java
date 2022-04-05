@@ -22,10 +22,11 @@
  */
 package com.pvpin.pvpincore.modules.js.plugin;
 
+import com.oracle.truffle.js.lang.JavaScriptLanguage;
+import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
@@ -49,24 +50,15 @@ public class StringJSPlugin extends AbstractJSPlugin {
         super();
         this.player = player;
         this.src = src;
-        String name = Bukkit.getOfflinePlayer(player).getName() + "_" + UUID.randomUUID();
-        String version = "0.0.1";
-        String author = Bukkit.getOfflinePlayer(player).getName();
+        super.name = Bukkit.getOfflinePlayer(player).getName() + "_" + super.uuid;
+        super.version = "0.0.1";
+        super.author = Bukkit.getOfflinePlayer(player).getName();
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-        try {
-            context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
-        } catch (IOException ex) {
-            PVPINLogManager.log(ex);
-        }
-        context.getBindings("js").putMember("name", name);
-        context.getBindings("js").putMember("version", version);
-        context.getBindings("js").putMember("author", author);
-        context.getPolyglotBindings().putMember("name", getName());
-        context.getPolyglotBindings().putMember("version", getVersion());
-        context.getPolyglotBindings().putMember("author", getAuthor());
 
-        context.eval(Source.newBuilder("js", this.src, name).buildLiteral());
+        super.value = PVPINCore.getScriptManagerInstance().getContext()
+                .eval(Source.newBuilder("js", this.src, super.uuid.toString())
+                        .mimeType(JavaScriptLanguage.MODULE_MIME_TYPE).buildLiteral());
 
         this.logger = PVPINLogManager.getLogger(this.getName());
         Thread.currentThread().setContextClassLoader(appCl);
@@ -78,14 +70,18 @@ public class StringJSPlugin extends AbstractJSPlugin {
 
     @Override
     public void enable() {
-        if (context.getBindings("js").hasMember("main")) {
-            if (context.getBindings("js").getMember("main").canExecute()) {
-                Value func = context.getBindings("js").getMember("main");
-                func.executeVoid();
+        try {
+            if (!value.hasMember("main")) {
+                throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
             }
+            if (!value.getMember("main").canExecute()) {
+                throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
+            }
+            Value func = value.getMember("main");
+            func.executeVoid();
+        } catch (Exception ex) {
+            PVPINLogManager.log(ex);
         }
-        Player me = Bukkit.getOfflinePlayer(player).isOnline() ? Bukkit.getPlayer(player) : null;
-        context.getBindings("js").putMember("me", me);
     }
 
     @Override
@@ -93,31 +89,15 @@ public class StringJSPlugin extends AbstractJSPlugin {
         ListenerManager.unregisterListener(this.getName());
         CommandManager.unregisterJavaScriptCmds(this.getName());
         ScheduledTaskManager.cancelTasks(this.getName());
-        PersistenceManager.getCurrentHolder().saveToFile();
-        context.close(true);
+        // PersistenceManager.getCurrentHolder().saveToFile();
     }
 
     @Override
     public boolean isValid() {
-        if (context.getPolyglotBindings().hasMember("close")) {
-            return false;
-        }
         if (!Bukkit.getOfflinePlayer(player).isOnline()) {
             return false;
         }
-        List<String> list = List.of("name", "version", "author");
-        for (String action : list) {
-            if (!context.getPolyglotBindings().hasMember(action)) {
-                JSPluginAccessController.denyAccess(context);
-                return false;
-            }
-            if (!context.getPolyglotBindings().getMember(action).asString()
-                    .equals(context.getBindings("js").getMember(action).asString())) {
-                JSPluginAccessController.denyAccess(context);
-                return false;
-            }
-        }
-        return true;
+        return name != null && version != null && author != null;
     }
 
     public UUID getPlayer() {
@@ -146,20 +126,5 @@ public class StringJSPlugin extends AbstractJSPlugin {
         result = 31 * result + this.getAuthor().hashCode();
         result = 31 * result + this.src.hashCode();
         return result;
-    }
-
-    @Override
-    public boolean equals(Object another) {
-        if (another == this) {
-            return true;
-        }
-        if (another instanceof StringJSPlugin) {
-            StringJSPlugin plugin = (StringJSPlugin) another;
-            return (this.getName().equals(plugin.getName()))
-                    && (this.getVersion().equals(plugin.getVersion()))
-                    && (this.getAuthor().equals(plugin.getAuthor()))
-                    && (this.src.equals(plugin.src));
-        }
-        return false;
     }
 }

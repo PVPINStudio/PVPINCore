@@ -33,37 +33,23 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author William_Shi
  */
 public abstract class AbstractJSPlugin {
-    protected Context context;
+    protected Value value;
     protected Logger logger;
+    protected UUID uuid = UUID.randomUUID();
+
+    protected String name;
+    protected String version;
+    protected String author;
 
     protected AbstractJSPlugin() {
-        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-        // Replace the AppClassLoader
-        this.context = Context.newBuilder("js")
-                .allowHostAccess(HostAccess.newBuilder(HostAccess.ALL)
-                        .targetTypeMapping(Value.class, Object.class, Value::hasArrayElements,
-                                v -> new LinkedList<>(v.as(List.class)))
-                        .build())
-                // https://github.com/oracle/graaljs/issues/214
-                .allowCreateProcess(false)
-                .allowCreateThread(false)
-                .allowIO(false)
-                .allowEnvironmentAccess(EnvironmentAccess.INHERIT)
-                .allowPolyglotAccess(PolyglotAccess.NONE)
-                .allowNativeAccess(true)
-                .allowHostClassLoading(true)
-                .allowHostClassLookup(JSPluginAccessController::checkJSLookUpHostClass)
-                .out(new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out))))
-                .allowExperimentalOptions(true)
-                .option("js.scripting", "true")
-                .build();
-        Thread.currentThread().setContextClassLoader(appCl);
+
     }
 
     public abstract void enable();
@@ -73,24 +59,26 @@ public abstract class AbstractJSPlugin {
     public abstract boolean isValid();
 
     public String getName() {
-        if (!context.getPolyglotBindings().hasMember("name")) {
-            return context.getBindings("js").getMember("name").asString();
-        }
-        return context.getPolyglotBindings().getMember("name").asString();
+        return name;
     }
 
     public String getVersion() {
-        if (!context.getPolyglotBindings().hasMember("version")) {
-            return context.getBindings("js").getMember("version").asString();
-        }
-        return context.getPolyglotBindings().getMember("version").asString();
+        return version;
     }
 
     public String getAuthor() {
-        if (!context.getPolyglotBindings().hasMember("author")) {
-            return context.getBindings("js").getMember("author").asString();
-        }
-        return context.getPolyglotBindings().getMember("author").asString();
+        return author;
     }
 
+    public UUID getId() {
+        return this.uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractJSPlugin that = (AbstractJSPlugin) o;
+        return Objects.equals(uuid, that.uuid);
+    }
 }

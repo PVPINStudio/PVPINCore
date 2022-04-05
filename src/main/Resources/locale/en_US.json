@@ -4,7 +4,7 @@
   "init.dependency": "Dependency System Loaded！",
   "init.security": "Security Manager Loaded！",
   "init.cmd": "Commands registered！",
-  "init.js": "Start Loading JavaScript Plugins asynchronously：",
+  "init.js": "Start Loading JavaScript Plugins：",
   "init.ok": "PVPIN OK.",
   "nbt.datatype": "Unsupported data type.",
   "persistence.access.java": "Illegal access to data without using PVPINCore APIs.",

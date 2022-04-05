@@ -33,7 +33,8 @@ import org.graalvm.polyglot.Context;
 /**
  * @author William_Shi
  */
-@PVPINLoadOnEnable
+@Deprecated
+// @PVPINLoadOnEnable
 public class InfoParser {
     protected String code;
     protected FunctionNode node;

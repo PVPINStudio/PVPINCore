@@ -4,7 +4,7 @@
   "init.dependency": "依賴系統初始化完畢！",
   "init.security": "安全管理初始化完畢！",
   "init.cmd": "指令系統初始化完畢！",
-  "init.js": "開始異步加載 JavaScript 插件：",
+  "init.js": "開始加載 JavaScript 插件：",
   "init.ok": "PVPIN OK.",
   "nbt.datatype": "該數據類型無灋存入二進制文件",
   "persistence.access.java": "無權繞過PVPIN持久化系統直接訪問數據",

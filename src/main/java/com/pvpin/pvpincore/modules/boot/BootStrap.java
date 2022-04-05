@@ -25,13 +25,14 @@ package com.pvpin.pvpincore.modules.boot;
 import com.pvpin.pvpincore.impl.nms.VersionChecker;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.i18n.I18N;
-import com.pvpin.pvpincore.modules.js.security.JSSecurityManager;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import sun.misc.Unsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.Policy;
@@ -50,42 +51,6 @@ public class BootStrap {
         // Download libraries.
         PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.dependency"));
 
-        PVPINCore.getCoreInstance().saveResource("com/pvpin/pvpincore/modules/js/security/pvpin.policy", true);
-        File policyFileOrigin = new File(PVPINCore.getCoreInstance().getDataFolder(), "com/pvpin/pvpincore/modules/js/security/pvpin.policy");
-        File policyFileNew = new File(PVPINCore.getCoreInstance().getDataFolder(), "security/pvpin.policy");
-        // Save the policy file to a local folder, and move it to an appropriate location.
-        // Delete the com/ directory after use.
-        boolean bool = policyFileNew.exists() ? policyFileNew.delete() : policyFileNew.getParentFile().mkdirs();
-        policyFileOrigin.renameTo(policyFileNew);
-        Files.walkFileTree(new File(PVPINCore.getCoreInstance().getDataFolder(), "com").toPath(), Set.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.deleteIfExists(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.deleteIfExists(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        System.setProperty("java.security.policy", policyFileNew.toURI().toURL().toString());
-        Policy.getPolicy().refresh();
-        System.setSecurityManager(new JSSecurityManager());
-        // Replace the old security manager.
-        PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.security"));
-
         Class.forName(VersionChecker.class.getName());
         // VersionChecker is used in many NMS related classes.
         // So load it before any NMSUtils subclass is loaded.
@@ -97,6 +62,12 @@ public class BootStrap {
                     .forEach(action -> {
                         try {
                             action.loadClass();
+                            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                            theUnsafe.setAccessible(true);
+                            Unsafe unsafe = (Unsafe) theUnsafe.get(null);
+                            Field module = Class.class.getDeclaredField("module");
+                            long offset = unsafe.objectFieldOffset(module);
+                            unsafe.putObject(action.loadClass(), offset, Object.class.getModule());
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }

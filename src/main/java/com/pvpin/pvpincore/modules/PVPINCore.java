@@ -24,7 +24,6 @@ package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.modules.boot.BootStrap;
-import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.jsloader.command.MainCommand;
 import com.pvpin.pvpincore.modules.logging.PVPINLoggerFactory;
@@ -43,13 +42,11 @@ public class PVPINCore extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
-        coreInstance = this;
-        pluginManagerInstance = new PVPINPluginManager();
-        scriptManagerInstance = new PVPINScriptManager();
-
         try {
+            coreInstance = this;
             BootStrap.boot();
+            pluginManagerInstance = new PVPINPluginManager();
+            scriptManagerInstance = new PVPINScriptManager();
         } catch (Exception ex) {
             ex.printStackTrace();
             // Logger is not initialized yet.
@@ -65,6 +62,8 @@ public class PVPINCore extends JavaPlugin {
         System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
         // Ignore the warning that the polyglot context is using an implementation
         // that does not support runtime compilation.
+        System.setProperty("js.esm-eval-returns-exports", "true");
+        // Expose the ES module namespace exported object to a Polyglot Context.
 
         PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("init.js"));
         scriptManagerInstance.onEnable();
@@ -77,9 +76,6 @@ public class PVPINCore extends JavaPlugin {
     public void onDisable() {
         scriptManagerInstance.onDisable();
         PVPINLoggerFactory.getCoreLogger().info("全部 JavaScript 插件卸载完毕");
-
-        PersistenceManager.saveAll();
-        PVPINLoggerFactory.getCoreLogger().info("全部插件数据保存完毕");
     }
 
     public static Plugin getCoreInstance() {

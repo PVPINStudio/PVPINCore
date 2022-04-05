@@ -51,19 +51,6 @@ import sun.misc.Unsafe;
 @PVPINLoadOnEnable
 public class CommandManager {
 
-    static {
-        try {
-            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            Unsafe unsafe = (Unsafe) theUnsafe.get(null);
-            Field module = Class.class.getDeclaredField("module");
-            long offset = unsafe.objectFieldOffset(module);
-            unsafe.putObject(CommandManager.class, offset, Object.class.getModule());
-        } catch (NoSuchFieldException | IllegalAccessException ex) {
-            PVPINLogManager.log(ex);
-        }
-    }
-
     protected static final List<JSCommand> JAVASCRIPT_CMDS = new ArrayList(ConfigManager.PLUGIN_COMMAND_CAPACITY);
 
     /**

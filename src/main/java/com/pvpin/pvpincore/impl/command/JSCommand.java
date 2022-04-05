@@ -30,6 +30,7 @@ import org.bukkit.command.TabExecutor;
 import org.graalvm.polyglot.Value;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class is used to extend Command Executor for JavaScript plugins.
@@ -47,8 +48,8 @@ public class JSCommand implements TabExecutor {
         this.cmdName = cmdName;
         this.cmdCallback = cmdCallback;
         this.tabCallback = tabCallback;
-        this.plugin = PVPINCore.getScriptManagerInstance().getPluginByName(
-                cmdCallback.getContext().getPolyglotBindings().getMember("name").asString()
+        this.plugin = PVPINCore.getScriptManagerInstance().getPluginByUUID(
+                UUID.fromString(cmdCallback.getSourceLocation().getSource().getName())
         );
         plugin.isValid();
     }

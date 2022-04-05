@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * @author William_Shi
  */
+@Deprecated
 public class LoopParser {
     protected String code;
     protected static final String CHECK_IN = "var pvpinLoopTime0 = 0;\n";
@@ -50,6 +51,7 @@ public class LoopParser {
 
 }
 
+@Deprecated
 class ForVisitor {
     protected String code;
     protected FunctionNode node;
@@ -108,6 +110,7 @@ class ForVisitor {
     }
 }
 
+@Deprecated
 class WhileVisitor {
     protected String code;
     protected FunctionNode node;

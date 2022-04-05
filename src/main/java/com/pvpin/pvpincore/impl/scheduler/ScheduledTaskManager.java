@@ -50,10 +50,7 @@ public class ScheduledTaskManager {
         if (!JSPluginAccessController.isLoadedByJavaScriptEngine()) {
             throw new RuntimeException(I18N.translateByDefault("scheduler.access"));
         }
-        Context context = Context.getCurrent();
-        String pluginName = context.getPolyglotBindings().getMember("name").asString();
-        PVPINCore.getScriptManagerInstance().getPluginByName(pluginName).isValid();
-        return new TaskBuilder(PVPINCore.getScriptManagerInstance().getPluginByName(pluginName));
+        return new TaskBuilder();
     }
 
     public static void cancelTasks(String pluginName) {

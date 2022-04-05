@@ -28,6 +28,8 @@ import com.pvpin.pvpincore.modules.i18n.I18N;
 import com.pvpin.pvpincore.modules.js.plugin.AbstractJSPlugin;
 import org.graalvm.polyglot.Value;
 
+import java.util.UUID;
+
 /**
  * @author William_Shi
  */
@@ -38,8 +40,7 @@ public class TaskBuilder {
     protected Long interval = 0L;
     protected Long delay = 0L;
 
-    protected TaskBuilder(AbstractJSPlugin plugin) {
-        this.plugin = plugin;
+    protected TaskBuilder() {
     }
 
     /**
@@ -80,6 +81,9 @@ public class TaskBuilder {
      */
     public TaskBuilder callback(Value callback) {
         this.callback = callback;
+        this.plugin = PVPINCore.getScriptManagerInstance().getPluginByUUID(
+                UUID.fromString(callback.getSourceLocation().getSource().getName())
+        );
         return this;
     }
 

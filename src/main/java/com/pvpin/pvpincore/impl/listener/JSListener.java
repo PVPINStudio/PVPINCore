@@ -31,6 +31,7 @@ import org.graalvm.polyglot.Value;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author William_Shi
@@ -47,8 +48,8 @@ public class JSListener {
         this.priority = priority;
         this.ignoreCancelled = ignoreCancelled;
         this.callback = callback;
-        this.plugin = PVPINCore.getScriptManagerInstance().getPluginByName(
-                callback.getContext().getPolyglotBindings().getMember("name").asString()
+        this.plugin = PVPINCore.getScriptManagerInstance().getPluginByUUID(
+                UUID.fromString(callback.getSourceLocation().getSource().getName())
         );
         plugin.isValid();
     }

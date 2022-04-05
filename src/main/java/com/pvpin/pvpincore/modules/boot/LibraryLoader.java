@@ -87,7 +87,7 @@ public class LibraryLoader {
 
             DependencyResult result;
             List<Dependency> dependencies = new ArrayList<>();
-            for (String library : List.of("org.graalvm.sdk:graal-sdk:21.2.0", "org.graalvm.js:js:21.2.0", "org.graalvm.js:js-scriptengine:21.2.0")) {
+            for (String library : List.of("org.graalvm.sdk:graal-sdk:21.3.1", "org.graalvm.js:js:21.3.1", "org.graalvm.js:js-scriptengine:21.3.1")) {
                 DefaultArtifact defaultArtifact = new DefaultArtifact(library);
                 Dependency dependency = new Dependency((Artifact) defaultArtifact, null);
                 dependencies.add(dependency);

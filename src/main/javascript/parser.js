@@ -2,10 +2,14 @@ const CHECK_IN = "var pvpinLoopTime0 = 0;\n";
 const CHECK_OUT = "if(pvpinLoopTime0++ > 1000) throw \"Runtime Exception: Dead Loop\";\n";
 
 function parse(code) {
-    return new Parser0(code).parse0();
+    return new LoopParser0(code).parse0();
 }
 
-class Parser0 {
+function parseInfo(code) {
+    return new InfoParser0(code).parseInfo0();
+}
+
+class LoopParser0 {
     constructor(code) {
         this.ast = pvpincore_parse0(code);
         this.code = code;
@@ -65,5 +69,74 @@ class Parser0 {
                 this.arrayWalk0(element);
             }
         });
+    }
+}
+
+class InfoParser0{
+    constructor(code) {
+        this.ast = pvpincore_parse0(code);
+        this.code = code;
+    }
+    parseInfo0() {
+        var info = {};
+        this.ast["body"].forEach(element => {
+            if (element["type"] == "ExportNamedDeclaration" || element["type"] == "VariableDeclaration") {
+                if (element["declaration"]) {
+                    if (element["declaration"]["type"] != "FunctionDeclaration") {
+                        element["declaration"]["declarations"].forEach(declaration => {
+                            var varName = declaration["id"]["name"];
+                            if (varName == "name" || varName == "version" || varName == "author") {
+                                if (!info[varName]) {
+                                    if (declaration["init"]) {
+                                        if (declaration["init"]["type"] == "Literal") {
+                                            info[varName] = declaration["init"]["value"];
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else if (element["declarations"]) {
+                    element["declarations"].forEach(declaration => {
+                        var varName = declaration["id"]["name"];
+                        if (varName == "name" || varName == "version" || varName == "author") {
+                            if (!info[varName]) {
+                                if (declaration["init"]) {
+                                    if (declaration["init"]["type"] == "Literal") {
+                                        info[varName] = declaration["init"]["value"];
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            if (element["type"] == "ExpressionStatement") {
+                if (element["expression"]["type"] == "AssignmentExpression") {
+                    var varName = element["expression"]["left"]["name"];
+                    if (varName == "name" || varName == "version" || varName == "author") {
+                        if (!info[varName]) {
+                            if (element["expression"]["right"]["type"] == "Literal") {
+                                info[varName] = element["expression"]["right"]["value"];
+                            }
+                        }
+                    }
+                } else if (element["expression"]["type"] == "SequenceExpression") {
+                    element["expression"]["expressions"].forEach(declaration => {
+                        if (declaration["type"] == "AssignmentExpression") {
+                            var varName = declaration["left"]["name"];
+                            if (varName == "name" || varName == "version" || varName == "author") {
+                                if (!info[varName]) {
+                                    if (declaration["right"]["type"] == "Literal") {
+                                        info[varName] = declaration["right"]["value"];
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        return [info["name"], info["version"], info["author"]];
     }
 }

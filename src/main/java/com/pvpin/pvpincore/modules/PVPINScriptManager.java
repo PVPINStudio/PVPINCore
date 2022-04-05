@@ -25,12 +25,11 @@ package com.pvpin.pvpincore.modules;
 
 import com.pvpin.pvpincore.modules.config.ConfigManager;
 import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.js.security.PVPINFileSystem;
 import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
-import com.pvpin.pvpincore.api.PVPINPersistence;
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.impl.listener.JSListener;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.impl.scheduler.TaskBuilder;
 import com.pvpin.pvpincore.modules.js.parser.ParserManager;
@@ -42,13 +41,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Source;
-import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.*;
+import org.graalvm.polyglot.management.ExecutionListener;
 
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class is used to manage all methods designed for JavaScript plugins.
@@ -59,9 +59,49 @@ public class PVPINScriptManager {
 
     protected final Map<String, AbstractJSPlugin> MAP = new HashMap<>(ConfigManager.PLUGIN_CAPACITY);
     protected BukkitTask task = null;
+    protected final Context SCRIPT_CONTEXT;
 
-    protected PVPINScriptManager() {
+    protected PVPINScriptManager() throws Exception {
         // Used by main class PVPINCore only.
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        // Replace the AppClassLoader
+        SCRIPT_CONTEXT = Context.newBuilder("js")
+                .allowHostAccess(HostAccess.newBuilder(HostAccess.ALL)
+                        .targetTypeMapping(Value.class, Object.class, Value::hasArrayElements,
+                                v -> new LinkedList<>(v.as(List.class)))
+                        .build())
+                // https://github.com/oracle/graaljs/issues/214
+                .allowCreateProcess(false)
+                .allowCreateThread(false)
+                .allowIO(true)
+                .fileSystem(new PVPINFileSystem())
+                .allowEnvironmentAccess(EnvironmentAccess.INHERIT)
+                .allowPolyglotAccess(PolyglotAccess.NONE)
+                .allowNativeAccess(true)
+                .allowHostClassLookup(name -> JSPluginAccessController.checkJSLookUpHostClass(name))
+                .allowHostClassLoading(true)
+                .out(new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out))))
+                .allowExperimentalOptions(true)
+                .option("js.scripting", "true")
+                .option("js.esm-eval-returns-exports", "true")
+                .build();
+        ExecutionListener listener = ExecutionListener.newBuilder()
+                .onEnter(event -> {
+                    if (String.valueOf(event.getLocation().getCharacters()).startsWith("eval")) {
+                        throw new RuntimeException(I18N.translateByDefault("js.access"));
+                    }
+                })
+                .statements(true)
+                .attach(SCRIPT_CONTEXT.getEngine());
+        Thread.currentThread().setContextClassLoader(appCl);
+    }
+
+    public synchronized Context getContext() {
+        if (JSPluginAccessController.isLoadedByJavaScriptEngine()) {
+            throw new RuntimeException(I18N.translateByDefault("js.access"));
+        }
+        return SCRIPT_CONTEXT;
     }
 
     /**
@@ -74,13 +114,11 @@ public class PVPINScriptManager {
             return;
         }
         try {
-            Bukkit.getScheduler().runTaskAsynchronously(PVPINCore.getCoreInstance(), () -> {
-                for (File file : Objects.requireNonNull(js.listFiles(
-                        ((dir, name) -> name.endsWith(".js"))
-                ))) {
-                    this.enablePlugin(file);
-                }
-            });
+            for (File file : Objects.requireNonNull(js.listFiles(
+                    ((dir, name) -> name.endsWith(".js") && !name.equals("api.js"))
+            ))) {
+                this.enablePlugin(file);
+            }
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
         }
@@ -151,6 +189,18 @@ public class PVPINScriptManager {
     }
 
     /**
+     * This method is used to stop executing a JavaScript plugin by its UUID.
+     *
+     * @param pluginId UUID of the plugin
+     */
+    public synchronized void disablePlugin(UUID pluginId) {
+        MAP.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().getId().equals(pluginId))
+                .forEach(entry -> disablePlugin(entry.getKey()));
+    }
+
+    /**
      * This method is used to load a JavaScript plugin by its file.
      *
      * @param file the javascript file
@@ -162,37 +212,11 @@ public class PVPINScriptManager {
             }
             ClassLoader appCl = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-            String src0 = ParserManager.parse(
-                    Source.newBuilder("js", file).encoding(StandardCharsets.UTF_8).build()
-                            .getCharacters().toString()
-            );
+            String src0 = ParserManager.parse(Files.readString(file.toPath(), StandardCharsets.UTF_8));
             Thread.currentThread().setContextClassLoader(appCl);
             Bukkit.getScheduler().runTask(PVPINCore.getCoreInstance(), () -> {
                 LocalFileJSPlugin plugin = new LocalFileJSPlugin(file, src0);
-                PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("js.enable.file"), plugin.getName(), plugin.getSourceFile().getName());
-                if (plugin.getName().isBlank() || plugin.getName().isEmpty() || plugin.getName().endsWith(" ") || plugin.getName().startsWith(" ")) {
-                    PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.name"), plugin.getSourceFile().getName());
-                    plugin.disable();
-                }
-                if (plugin.getVersion().isBlank() || plugin.getVersion().isEmpty() || plugin.getVersion().endsWith(" ") || plugin.getVersion().startsWith(" ")) {
-                    PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.version"), plugin.getSourceFile().getName());
-                    plugin.disable();
-                }
-                if (plugin.getAuthor().isBlank() || plugin.getAuthor().isEmpty() || plugin.getAuthor().endsWith(" ") || plugin.getAuthor().startsWith(" ")) {
-                    PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.author"), plugin.getSourceFile().getName());
-                    plugin.disable();
-                }
                 if (MAP.containsKey(plugin.getName())) {
-                    AbstractJSPlugin old = MAP.get(plugin.getName());
-                    if (old instanceof LocalFileJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.1"));
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.2"), old.getName(), old.getVersion(), ((LocalFileJSPlugin) old).getSourceFile());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.3"), plugin.getName(), plugin.getVersion(), plugin.getSourceFile());
-                    } else if (old instanceof StringJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.6"), plugin.getSourceFile().getName());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.4"), old.getName(), old.getVersion(), Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.3"), plugin.getName(), plugin.getVersion(), plugin.getSourceFile());
-                    }
                     plugin.disable();
                 } else {
                     MAP.put(plugin.getName(), plugin);
@@ -222,15 +246,6 @@ public class PVPINScriptManager {
                 PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("js.enable.string"), plugin.getName(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
                 if (MAP.containsKey(plugin.getName())) {
                     AbstractJSPlugin old = MAP.get(plugin.getName());
-                    if (old instanceof LocalFileJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.1"));
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.2"), old.getName(), old.getVersion(), ((LocalFileJSPlugin) old).getSourceFile());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.5"), plugin.getName(), plugin.getVersion(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
-                    } else if (old instanceof StringJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.1"));
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.4"), old.getName(), old.getVersion(), Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.5"), plugin.getName(), plugin.getVersion(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
-                    }
                     plugin.disable();
                 } else {
                     MAP.put(plugin.getName(), plugin);
@@ -257,15 +272,6 @@ public class PVPINScriptManager {
                 PVPINLoggerFactory.getCoreLogger().info(I18N.translateByDefault("js.enable.string"), plugin.getName(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
                 if (MAP.containsKey(plugin.getName())) {
                     AbstractJSPlugin old = MAP.get(plugin.getName());
-                    if (old instanceof LocalFileJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.1"));
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.2"), old.getName(), old.getVersion(), ((LocalFileJSPlugin) old).getSourceFile());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.5"), plugin.getName(), plugin.getVersion(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
-                    } else if (old instanceof StringJSPlugin) {
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.1"));
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.4"), old.getName(), old.getVersion(), Bukkit.getOfflinePlayer(((StringJSPlugin) old).getPlayer()).getName());
-                        PVPINLoggerFactory.getCoreLogger().warn(I18N.translateByDefault("js.enable.redundant.5"), plugin.getName(), plugin.getVersion(), Bukkit.getOfflinePlayer(plugin.getPlayer()).getName());
-                    }
                     plugin.disable();
                 } else {
                     MAP.put(plugin.getName(), plugin);
@@ -286,6 +292,19 @@ public class PVPINScriptManager {
      */
     public AbstractJSPlugin getPluginByName(String name) {
         return MAP.getOrDefault(name, null);
+    }
+
+    public AbstractJSPlugin getPluginByUUID(UUID uuid) {
+        AtomicReference<AbstractJSPlugin> reference = new AtomicReference<>();
+        MAP.forEach((str, plugin) -> {
+            if (reference.get() != null) {
+                return;
+            }
+            if (plugin.getId().equals(uuid)) {
+                reference.set(plugin);
+            }
+        });
+        return reference.get();
     }
 
     /**
@@ -363,33 +382,6 @@ public class PVPINScriptManager {
      */
     public TaskBuilder registerTask() {
         return ScheduledTaskManager.newTaskBuilder();
-    }
-
-    /**
-     * This method is used to get a map to store data permanently.
-     *
-     * @return the data map of the plugin calling this method
-     * @see PVPINPersistence#getDataMap()
-     */
-    public Map getDataMap() {
-        if (JSPluginAccessController.isLoadedByJavaScriptEngine()) {
-            return PersistenceManager.getCurrentHolder().getDataMap();
-        }
-        return null;
-    }
-
-    /**
-     * This method reads the contents in the file and disposes the current data in memory.
-     */
-    public void readPersistentDataFromFile() {
-        PersistenceManager.getCurrentHolder().readFromFile();
-    }
-
-    /**
-     * This method writes the data in memory to a file to store permanently.
-     */
-    public void savePersistentDataToFile() {
-        PersistenceManager.getCurrentHolder().saveToFile();
     }
 
 }

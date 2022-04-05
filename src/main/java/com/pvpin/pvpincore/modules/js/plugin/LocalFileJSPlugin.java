@@ -22,15 +22,14 @@
  */
 package com.pvpin.pvpincore.modules.js.plugin;
 
+import com.oracle.truffle.js.lang.JavaScriptLanguage;
 import com.pvpin.pvpincore.modules.i18n.I18N;
+import com.pvpin.pvpincore.modules.js.parser.ParserManager;
 import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.impl.command.CommandManager;
 import com.pvpin.pvpincore.impl.listener.ListenerManager;
-import com.pvpin.pvpincore.impl.persistence.PersistenceManager;
 import com.pvpin.pvpincore.impl.scheduler.ScheduledTaskManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
-import com.pvpin.pvpincore.modules.js.parser.InfoParser;
-import com.pvpin.pvpincore.modules.js.parser.LoopParser;
 import com.pvpin.pvpincore.modules.js.security.JSPluginAccessController;
 import org.graalvm.polyglot.*;
 
@@ -52,54 +51,14 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
             // Replace the AppClassLoader
             this.file = file;
             this.src = src;
-            InfoParser parser = new InfoParser(src);
-            try {
-                context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
-            } catch (IOException ex) {
-                PVPINLogManager.log(ex);
-            }
-            context.getBindings("js").putMember("name", parser.parseName());
-            context.getBindings("js").putMember("version", parser.parseVersion());
-            context.getBindings("js").putMember("author", parser.parseAuthor());
-            context.getPolyglotBindings().putMember("name", parser.parseName());
-            context.getPolyglotBindings().putMember("version", parser.parseVersion());
-            context.getPolyglotBindings().putMember("author", parser.parseAuthor());
+            List<String> info = ParserManager.parseInfo(src);
+            this.name = info.get(0);
+            this.version = info.get(1);
+            this.author = info.get(2);
+            super.value = PVPINCore.getScriptManagerInstance().getContext()
+                    .eval(Source.newBuilder("js", this.src, super.uuid.toString())
+                            .mimeType(JavaScriptLanguage.MODULE_MIME_TYPE).buildLiteral());
 
-            context.eval(Source.newBuilder("js", this.src, "🐎").buildLiteral());
-
-            this.logger = PVPINLogManager.getLogger(this.getName());
-            this.logger.info(getName() + " has been loaded.");
-            Thread.currentThread().setContextClassLoader(appCl);
-        } catch (Exception ex) {
-            PVPINLogManager.log(ex);
-        }
-    }
-
-    @Deprecated
-    public LocalFileJSPlugin(File file) {
-        super();
-        try {
-            ClassLoader appCl = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-            // Replace the AppClassLoader
-            this.file = file;
-            this.src = new LoopParser(
-                    Source.newBuilder(Source.findLanguage(file), file).build().getCharacters().toString()
-            ).parse();
-            // System.out.println(this.src);
-            InfoParser parser = new InfoParser(src);
-            context.getBindings("js").putMember("name", parser.parseName());
-            context.getBindings("js").putMember("version", parser.parseVersion());
-            context.getBindings("js").putMember("author", parser.parseAuthor());
-            context.getPolyglotBindings().putMember("name", parser.parseName());
-            context.getPolyglotBindings().putMember("version", parser.parseVersion());
-            context.getPolyglotBindings().putMember("author", parser.parseAuthor());
-            try {
-                context.eval(Source.newBuilder("js", PVPINCore.class.getResource("/api.js")).build());
-                context.eval(Source.newBuilder("js", this.src, "🐎").buildLiteral());
-            } catch (IOException ex) {
-                PVPINLogManager.log(ex);
-            }
             this.logger = PVPINLogManager.getLogger(this.getName());
             this.logger.info(getName() + " has been loaded.");
             Thread.currentThread().setContextClassLoader(appCl);
@@ -111,13 +70,13 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
     @Override
     public void enable() {
         try {
-            if (!context.getBindings("js").hasMember("main")) {
+            if (!value.hasMember("main")) {
                 throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
             }
-            if (!context.getBindings("js").getMember("main").canExecute()) {
+            if (!value.getMember("main").canExecute()) {
                 throw new RuntimeException(I18N.translateByDefault("js.parser.main"));
             }
-            Value func = context.getBindings("js").getMember("main");
+            Value func = value.getMember("main");
             func.executeVoid();
         } catch (Exception ex) {
             PVPINLogManager.log(ex);
@@ -129,27 +88,11 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
         ListenerManager.unregisterListener(this.getName());
         CommandManager.unregisterJavaScriptCmds(this.getName());
         ScheduledTaskManager.cancelTasks(this.getName());
-        PersistenceManager.getCurrentHolder().saveToFile();
-        context.close(true);
+        // PersistenceManager.getCurrentHolder().saveToFile();
     }
 
     public boolean isValid() {
-        if (context.getPolyglotBindings().hasMember("close")) {
-            return false;
-        }
-        List<String> list = List.of("name", "version", "author");
-        for (String action : list) {
-            if (!context.getPolyglotBindings().hasMember(action)) {
-                JSPluginAccessController.denyAccess(context);
-                return false;
-            }
-            if (!context.getPolyglotBindings().getMember(action).asString()
-                    .equals(context.getBindings("js").getMember(action).asString())) {
-                JSPluginAccessController.denyAccess(context);
-                return false;
-            }
-        }
-        return true;
+        return name != null && version != null && author != null;
     }
 
     public File getSourceFile() {
@@ -179,20 +122,5 @@ public class LocalFileJSPlugin extends AbstractJSPlugin {
         result = 31 * result + this.getAuthor().hashCode();
         result = 31 * result + this.getSourceFile().hashCode();
         return result;
-    }
-
-    @Override
-    public boolean equals(Object another) {
-        if (another == this) {
-            return true;
-        }
-        if (another instanceof LocalFileJSPlugin) {
-            LocalFileJSPlugin plugin = (LocalFileJSPlugin) another;
-            return (this.getName().equals(plugin.getName()))
-                    && (this.getVersion().equals(plugin.getVersion()))
-                    && (this.getAuthor().equals(plugin.getAuthor()))
-                    && (this.getSourceFile().equals(plugin.getSourceFile()));
-        }
-        return false;
     }
 }

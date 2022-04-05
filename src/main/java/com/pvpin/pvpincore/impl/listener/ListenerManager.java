@@ -27,10 +27,7 @@ import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import com.pvpin.pvpincore.modules.config.ConfigManager;
 import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.PVPINPluginManager;
@@ -235,7 +232,9 @@ public class ListenerManager {
                 // Stores all the elements to be deleted.
                 list.forEach(listener -> {
                     listener.plugin.isValid();
-                    if (listener.callback.getContext().getPolyglotBindings().getMember("name").asString().equals(pluginName)) {
+                    if (UUID.fromString(
+                            listener.callback.getSourceLocation().getSource().getName()
+                    ).equals(PVPINCore.getScriptManagerInstance().getPluginByName(pluginName).getId())) {
                         temp.add(listener);
                     }
                 });

@@ -7,6 +7,7 @@ var pvpincore_parse0;
     pvpincore_parse0 = function (code) {
       return espree.parse(code, {
         ecmaVersion: "latest",
+        sourceType: "module",
         range: true
       });
     }

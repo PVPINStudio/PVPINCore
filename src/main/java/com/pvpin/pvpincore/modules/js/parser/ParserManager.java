@@ -29,8 +29,10 @@ import com.pvpin.pvpincore.modules.logging.PVPINLogManager;
 import com.pvpin.pvpincore.modules.PVPINCore;
 import com.pvpin.pvpincore.modules.boot.PVPINLoadOnEnable;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.TypeLiteral;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author William_Shi
@@ -38,21 +40,42 @@ import java.io.IOException;
 @PVPINLoadOnEnable
 public class ParserManager {
 
+    protected static final Context INTERNAL_CONTEXT;
+
+    static {
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        INTERNAL_CONTEXT = Context.newBuilder("js").allowAllAccess(true).build();
+        try {
+            INTERNAL_CONTEXT.getPolyglotBindings().putMember("internal", true);
+            INTERNAL_CONTEXT.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/espree.js")).build());
+            INTERNAL_CONTEXT.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/parser.js")).build());
+        } catch (IOException ex) {
+            PVPINLogManager.log(ex);
+        } finally {
+            Thread.currentThread().setContextClassLoader(appCl);
+        }
+    }
+
     public static String parse(String code) {
         ClassLoader appCl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
-        String result = null;
-        try (Context cxt = Context.newBuilder("js").allowAllAccess(true).build()) {
-            cxt.getPolyglotBindings().putMember("internal", true);
-            cxt.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/espree.js")).build());
-            cxt.eval(org.graalvm.polyglot.Source.newBuilder("js", PVPINCore.class.getResource("/parser.js")).build());
-            cxt.getBindings("js").putMember("pvpin_src0", code);
-            result = cxt.eval("js", "parse(pvpin_src0)").asString();
-        } catch (IOException ex) {
-            PVPINLogManager.log(ex);
-        }
+        String result;
+        INTERNAL_CONTEXT.getBindings("js").putMember("pvpin_src0", code);
+        result = INTERNAL_CONTEXT.eval("js", "parse(pvpin_src0)").asString();
         Thread.currentThread().setContextClassLoader(appCl);
         return result;
+    }
+
+    public static List<String> parseInfo(String code) {
+        ClassLoader appCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(PVPINCore.getCoreInstance().getClass().getClassLoader());
+        List<String> result;
+        INTERNAL_CONTEXT.getBindings("js").putMember("pvpin_src0", code);
+        result = INTERNAL_CONTEXT.eval("js", "parseInfo(pvpin_src0)").as(List.class);
+        Thread.currentThread().setContextClassLoader(appCl);
+        return result;
+
     }
 
     /**
