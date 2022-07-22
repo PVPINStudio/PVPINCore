@@ -62,7 +62,7 @@ public class PVPINFileSystem implements FileSystem {
             Files.move(
                     Paths.get(new File(PVPINCore.getCoreInstance().getDataFolder(), "api.js").toURI()),
                     Paths.get(new File(FOLDER_PERMITTED_JS, "api.js").toURI()),
-                    StandardCopyOption.ATOMIC_MOVE
+                    StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException ex) {
             PVPINLogManager.log(ex);

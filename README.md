@@ -2,7 +2,7 @@
 
 ---
 
-PVPINCore 是由 PVPIN Studio 团队成员 `William_Shi`、 `Rain_Effect`、`MiaoWoo`、`Eustia_Saint` 共同开发的 Bukkit 插件。
+PVPINCore 是由 PVPIN Studio 团队成员开发的 Bukkit 插件。
 
 感谢 `ThatRarityEG` 在开发时提供的无私帮助。
 

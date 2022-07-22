@@ -28,11 +28,6 @@
             <url>https://repo.yumc.pw</url>
         </repository>
         <repository>
-            <id>celestialrealm-graaljsbox-pvpinstudio</id>
-            <name>pvpinstudio</name>
-            <url>https://celestialrealm-maven.pkg.coding.net/repository/graaljsbox/pvpinstudio/</url>
-        </repository>
-        <repository>
             <id>mulesoft-public</id>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
@@ -124,12 +119,6 @@
             <artifactId>js-scriptengine</artifactId>
             <version>21.3.1</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.pvpin.graaljsbox</groupId>
-            <artifactId>GraalJSBox</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.eclipse.aether/aether-api -->

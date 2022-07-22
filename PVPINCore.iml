@@ -31,7 +31,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.graalvm.truffle:truffle-api:21.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.ibm.icu:icu4j:69.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.graalvm.js:js-scriptengine:21.3.1" level="project" />
-    <orderEntry type="library" name="Maven: net.pvpin.graaljsbox:GraalJSBox:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.aether:aether-api:1.0.0.v20140518" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.aether:aether-util:1.0.0.v20140518" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.aether:aether-impl:1.0.0.v20140518" level="project" />

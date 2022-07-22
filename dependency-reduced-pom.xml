@@ -243,11 +243,6 @@
       <url>https://repo.yumc.pw</url>
     </repository>
     <repository>
-      <id>celestialrealm-graaljsbox-pvpinstudio</id>
-      <name>pvpinstudio</name>
-      <url>https://celestialrealm-maven.pkg.coding.net/repository/graaljsbox/pvpinstudio/</url>
-    </repository>
-    <repository>
       <id>mulesoft-public</id>
       <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
     </repository>
